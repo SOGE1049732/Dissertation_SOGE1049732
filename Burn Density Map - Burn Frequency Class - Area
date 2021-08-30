@@ -1,0 +1,288 @@
+// ************************ BURN DENSITY MAP - BURN FREQUENCY CLASSES - AREA ***************************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CLASSIFY PIXELS BY CATEGORIES OF FIRE FREQUENCY
+  // 2 - GET AREA REPRESENTED BY EACH CATEGORY
+  // 3 - CREATE MAP AND GRAPHS
+
+// -------------------------------------------------------------------------------------------------
+  
+  
+  
+/* 0 - IMPORTS */
+
+      // Image Collection
+      var imageCollection = ee.ImageCollection("MODIS/006/MCD64A1");
+      
+      // Study Area
+      var pantanal = table
+            .geometry();
+        
+      // Area of the Pantanal
+      var areaP = pantanal.area().divide(1000000);
+      print('Pantanal area', areaP);
+      
+      // Projection
+      var projection = imageCollection.first().projection();
+      print('projection', projection);
+      
+      // Scale
+      var scale = projection.nominalScale();
+      print('scale', scale);
+
+
+
+/* 1 - CLASSIFY PIXELS BY CATEGORIES OF FIRE FREQUENCY */
+
+
+  /** Add a classification band to the image collection **/
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = imageCollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject(
+                  {crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var aggregate_withoutArea = MCD64A1_annualcomposites
+              .map(function (x) {return x.unmask(0)})
+              .sum()
+              .clip(pantanal)
+              .reproject({
+                crs: projection, 
+                scale: scale
+              });
+
+
+
+/* 2 - GET AREA REPRESENTED BY EACH CATEGORY */
+
+
+  /** Create a list of all the fire frequencies categories **/
+    
+      // Get min value
+      var min = aggregate_withoutArea
+            .select('Classification')
+            .reduceRegion({
+              reducer: ee.Reducer.min(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('Classification'); //print('min', min);
+      
+      // Get max value
+      var max = aggregate_withoutArea
+            .select('Classification')
+            .reduceRegion({
+              reducer: ee.Reducer.max(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('Classification'); //print('max', max);
+      
+      // Create the list of categories from min and max value
+      var listofclasses = ee.List.sequence(min, max);
+      print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the area covered by the category in km²
+            - the area covered by the category in % of the Pantanal's area
+            **/
+  
+      /*** Create an aggregate with area values ***/
+          
+          // Create the Area-Band
+          var AreaBand = ee.Image.pixelArea()
+                  .reproject({
+                    crs: projection, 
+                    scale: scale
+                    })  
+                  .divide(1e6)
+                  .rename('Area')
+                  .copyProperties(aggregate_withoutArea, aggregate_withoutArea.propertyNames());
+              // // Test Area Band
+              // var MIN = aggregate.select('Area').reduceRegion({reducer: ee.Reducer.min(), scale: scale}).get('Area')
+              // var MAX = aggregate.select('Area').reduceRegion({reducer: ee.Reducer.max(), scale: scale}).get('Area')
+              // print(MIN)
+              // print(MAX)
+          
+          // Add the Area-Band to the aggregate
+          var aggregate = aggregate_withoutArea.addBands(AreaBand);
+            //print(aggregate_withoutArea);
+            //print(aggregate);
+        
+      /*** Create the function that returns the area ***/
+      function giveClassArea (x) {
+        var classOI = aggregate
+              .updateMask(aggregate.select('Classification').eq(ee.Number(x)));
+        var area = classOI
+              .select('Area')
+              .reduceRegion({
+                reducer: ee.Reducer.sum(),
+                geometry: pantanal,
+                crs: projection,
+                scale: scale
+              })
+              .get('Area');
+        var count = classOI
+              .select('Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.count(),
+                geometry: pantanal,
+                crs: projection,
+                scale: scale
+              })
+              .get('Classification');
+        var percenttotalarea = ee.Number(area)
+              .multiply(100)
+              .divide(areaP);
+        var totalburn = aggregate
+              .select('Area')
+              .updateMask(aggregate.select('Classification').gt(0))
+              .reduceRegion({
+                reducer: ee.Reducer.sum(),
+                geometry: pantanal,
+                crs: projection,
+                scale: scale
+              })
+              .get('Area');
+        var percenttotalburn = ee.Number(area)
+              .multiply(100)
+              .divide(totalburn);
+        var feature = ee.Feature(null, {'Class': x,
+                                        'Area': area,
+                                        'Burned_Pixels': count,
+                                        'Percentage_of_Pantanal_Area': percenttotalarea,
+                                        'Percentage_of_Total_Burned_Area': percenttotalburn
+        });
+        return feature;
+      }
+
+  /** Create a Feature Collection of all fires frequency categories and their associated area (in km² and in % of the Pantanal) **/
+  var percentperclass = ee.FeatureCollection(listofclasses.map(giveClassArea));
+  print('FeatureCollection of fire frequency categories and associated area', percentperclass);
+
+
+
+/* 3 - CREATE MAP AND GRAPHS */
+
+  /** Add the aggretate onto the map **/
+  var visParams = {
+        min: 0, 
+        max: 18, 
+        bands: ['Classification'], 
+        palette: [
+          'ffffff', 
+          '#DAF7A6', 
+          '#FFC300', 
+          '#FF5733', 
+          '#C70039', 
+          '#900C3F', 
+          '#581845'
+          ]
+      };
+  
+  Map.centerObject(pantanal);
+  Map.addLayer(aggregate_withoutArea, visParams, 'Burn Density Map', false);
+  Map.addLayer(aggregate, visParams, 'Aggregate with Area Band' ,false); // test that all pixels have the same area
+  
+  /** Create a graph of showing the area represented by each class in km² **/
+  var graph = ui.Chart.feature.byFeature(percentperclass, 'Class', 'Area');
+  
+  print(graph.setChartType("ColumnChart")
+            .setOptions({vAxis: {title: 'Area (km²)'},
+                          hAxis: {title: 'Class'}}));
+  
+  /** Create a graph of showing the percentage of Pantanal Area for each class **/
+  var graph = ui.Chart.feature.byFeature(percentperclass, 'Class', 'Percentage_of_Pantanal_Area');
+  
+  print(graph.setChartType("ColumnChart")
+            .setOptions({vAxis: {title: 'Percentage of Pantanal area'},
+                          hAxis: {title: 'Class'}}));
+                          
+// Export.table.toDrive({
+//   collection: percentperclass,
+//   description: 'WildfiresFrequencyClasses_Area',
+//   folder: 'BCM2020-2021/Dissertation',
+//   fileNamePrefix: 'WildfiresFrequencyClasses_Area'
+// });
+
+// Export.image.toDrive({
+//   image: aggregate.updateMask(aggregate.select('Classification').gt(0)).select('Classification').toDouble(),
+//   description: 'BurnedPixels_Frequency',
+//   folder: 'BCM2020-2021/Dissertation',
+//   fileNamePrefix: 'BurnedPixels_Frequency',
+//   scale: scale,
+//   crs: projection
+// });
