@@ -1,0 +1,109 @@
+// **************************************** NDVI TIMESERIES ***********************************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - AGGREGATE COLLECTION TO GIVE MONTHLY IMAGES WITH THE MEAN NDVI FOR THE MONTH AS PIXEL VALUE
+  // 2 - GET THE MEAN NDVI FOR EACH IMAGE OF THE IMAGE COLLECTION
+  // 3 - VISUALIZE THE RESULTS
+  // 4 - EXPORT THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+
+
+/* 0 - IMPORTS */
+
+  // Area of Interest
+  var pantanal = table.geometry();
+  
+  // Collection
+  var collection = imageCollection;
+  print(imageCollection.select('NDVI', 'EVI'));
+  
+  // Projection
+  var projection = collection.first().projection();
+  
+  // Scale
+  var scale = projection.nominalScale();
+
+
+
+/* 1 - AGGREGATE COLLECTION TO GIVE MONTHLY IMAGES WITH THE MEAN NDVI FOR THE MONTH AS PIXEL VALUE */
+
+// Select months of interest
+var months = ee.List.sequence(1, 12);
+// Select years of interest
+var years = ee.List.sequence(2001, 2020);
+var byMonthYear = ee.ImageCollection.fromImages(
+  years.map(function(y) {
+    return months.map(function (m) {
+      return collection.select('NDVI')
+        // gather data from each month
+        .filter(ee.Filter.calendarRange(y, y, 'year'))
+        .filter(ee.Filter.calendarRange(m, m, 'month'))
+        // attribute to each pixel the mean value for the month
+        .mean()
+        .set('month', m).set('year', y)
+        .set('system:time_start', ee.Date.fromYMD(y, m, 1));
+        });
+  
+}).flatten());
+print('NDVI_mean', byMonthYear);
+
+
+
+/* 2 - GET THE MEAN NDVI FOR EACH IMAGE OF THE IMAGE COLLECTION */
+
+    /** Create a function that extracts mean NDVI from an image **/
+    function getMeanNDVI (image) {
+      var date = ee.Date(image.get('system:time_start')).format('Y/M/d');
+      var meanNDVI = image
+            .select('NDVI')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('NDVI');
+      var sd = image
+            .select('NDVI')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('NDVI');
+      var feature = ee.Feature(null, {
+                                  'Date': date,
+                                  'Mean_NDVI': meanNDVI,
+                                  'Standard_Deviation': sd
+      });
+      return feature;
+    }
+
+    /** Apply the function to the collection **/
+    var NDVI_TimeSeries = byMonthYear.map(getMeanNDVI);
+    print('NDVI_TimeSeries', NDVI_TimeSeries);
+
+
+
+
+/* 3 - VISUALIZE THE RESULTS */
+
+var graph = ui.Chart.image.series(byMonthYear, pantanal, ee.Reducer.mean(), scale);
+print(graph);
+
+
+
+/* 4 - EXPORT THE RESULTS */
+
+// Export.table.toDrive({
+//   collection: NDVI_TimeSeries,
+//   description: 'NDVI_TimeSeries', 
+//   folder: 'BCM2020-2021/Dissertation',
+//   fileNamePrefix: 'NDVI_TimeSeries'
+// });
