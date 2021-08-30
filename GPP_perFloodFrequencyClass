@@ -344,67 +344,67 @@
 
   /** Create an Image Collection with dry season mean of the MOD17A3H.006 product **/
 
-        var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-07-01', '2001-09-30').sum()
+        var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-05-01', '2001-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2001-01-01', '2001-09-30').first().propertyNames());
-        var GPP_image2002 = GPPcollection.select('GPP').filterDate('2002-07-01', '2002-09-30').sum()
+        var GPP_image2002 = GPPcollection.select('GPP').filterDate('2002-05-01', '2002-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2002-01-01', '2002-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2002-01-01', '2002-09-30').first().propertyNames());
-        var GPP_image2003 = GPPcollection.select('GPP').filterDate('2003-07-01', '2003-09-30').sum()
+        var GPP_image2003 = GPPcollection.select('GPP').filterDate('2003-05-01', '2003-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2003-01-01', '2003-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2003-01-01', '2003-09-30').first().propertyNames());
-        var GPP_image2004 = GPPcollection.select('GPP').filterDate('2004-07-01', '2004-09-30').sum()
+        var GPP_image2004 = GPPcollection.select('GPP').filterDate('2004-05-01', '2004-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2004-01-01', '2004-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2004-01-01', '2004-09-30').first().propertyNames());
-        var GPP_image2005 = GPPcollection.select('GPP').filterDate('2005-07-01', '2005-09-30').sum()
+        var GPP_image2005 = GPPcollection.select('GPP').filterDate('2005-05-01', '2005-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2005-01-01', '2005-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2005-01-01', '2005-09-30').first().propertyNames());
-        var GPP_image2006 = GPPcollection.select('GPP').filterDate('2006-07-01', '2006-09-30').sum()
+        var GPP_image2006 = GPPcollection.select('GPP').filterDate('2006-05-01', '2006-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2006-01-01', '2006-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2006-01-01', '2006-09-30').first().propertyNames());
-        var GPP_image2007 = GPPcollection.select('GPP').filterDate('2007-07-01', '2007-09-30').sum()
+        var GPP_image2007 = GPPcollection.select('GPP').filterDate('2007-05-01', '2007-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2007-01-01', '2007-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2007-01-01', '2007-09-30').first().propertyNames());
-        var GPP_image2008 = GPPcollection.select('GPP').filterDate('2008-07-01', '2008-09-30').sum()
+        var GPP_image2008 = GPPcollection.select('GPP').filterDate('2008-05-01', '2008-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2008-01-01', '2008-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2008-01-01', '2008-09-30').first().propertyNames());
-        var GPP_image2009 = GPPcollection.select('GPP').filterDate('2009-07-01', '2009-09-30').sum()
+        var GPP_image2009 = GPPcollection.select('GPP').filterDate('2009-05-01', '2009-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2009-01-01', '2009-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2009-01-01', '2009-09-30').first().propertyNames());
-        var GPP_image2010 = GPPcollection.select('GPP').filterDate('2010-07-01', '2010-09-30').sum()
+        var GPP_image2010 = GPPcollection.select('GPP').filterDate('2010-05-01', '2010-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2010-01-01', '2010-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2010-01-01', '2010-09-30').first().propertyNames());
-        var GPP_image2011 = GPPcollection.select('GPP').filterDate('2011-07-01', '2011-09-30').sum()
+        var GPP_image2011 = GPPcollection.select('GPP').filterDate('2011-05-01', '2011-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2011-01-01', '2011-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2011-01-01', '2011-09-30').first().propertyNames());
-        var GPP_image2012 = GPPcollection.select('GPP').filterDate('2012-07-01', '2012-09-30').sum()
+        var GPP_image2012 = GPPcollection.select('GPP').filterDate('2012-05-01', '2012-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2012-01-01', '2012-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2012-01-01', '2012-09-30').first().propertyNames());
-        var GPP_image2013 = GPPcollection.select('GPP').filterDate('2013-07-01', '2013-09-30').sum()
+        var GPP_image2013 = GPPcollection.select('GPP').filterDate('2013-05-01', '2013-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2013-01-01', '2013-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2013-01-01', '2013-09-30').first().propertyNames());
-        var GPP_image2014 = GPPcollection.select('GPP').filterDate('2014-07-01', '2014-09-30').sum()
+        var GPP_image2014 = GPPcollection.select('GPP').filterDate('2014-05-01', '2014-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2014-01-01', '2014-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2014-01-01', '2014-09-30').first().propertyNames());
-        var GPP_image2015 = GPPcollection.select('GPP').filterDate('2015-07-01', '2015-09-30').sum()
+        var GPP_image2015 = GPPcollection.select('GPP').filterDate('2015-05-01', '2015-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2015-01-01', '2015-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2015-01-01', '2015-09-30').first().propertyNames());
-        var GPP_image2016 = GPPcollection.select('GPP').filterDate('2016-07-01', '2016-09-30').sum()
+        var GPP_image2016 = GPPcollection.select('GPP').filterDate('2016-05-01', '2016-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2016-01-01', '2016-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2016-01-01', '2016-09-30').first().propertyNames());
-        var GPP_image2017 = GPPcollection.select('GPP').filterDate('2017-07-01', '2017-09-30').sum()
+        var GPP_image2017 = GPPcollection.select('GPP').filterDate('2017-05-01', '2017-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2017-01-01', '2017-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2017-01-01', '2017-09-30').first().propertyNames());
-        var GPP_image2018 = GPPcollection.select('GPP').filterDate('2018-07-01', '2018-09-30').sum()
+        var GPP_image2018 = GPPcollection.select('GPP').filterDate('2018-05-01', '2018-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2018-01-01', '2018-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2018-01-01', '2018-09-30').first().propertyNames());
-        var GPP_image2019 = GPPcollection.select('GPP').filterDate('2019-07-01', '2019-09-30').sum()
+        var GPP_image2019 = GPPcollection.select('GPP').filterDate('2019-05-01', '2019-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2019-01-01', '2019-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2019-01-01', '2019-09-30').first().propertyNames());
-        var GPP_image2020 = GPPcollection.select('GPP').filterDate('2020-07-01', '2020-09-30').sum()
+        var GPP_image2020 = GPPcollection.select('GPP').filterDate('2020-05-01', '2020-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2020-01-01', '2020-09-30').first(), 
                             GPPcollection.select('GPP').filterDate('2020-01-01', '2020-09-30').first().propertyNames());
-      
+     
         var GPP_imageList = [GPP_image2001,
                         GPP_image2002,
                         GPP_image2003,
