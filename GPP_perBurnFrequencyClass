@@ -1,0 +1,1046 @@
+// ###########################################################################################################
+
+// PART 1 - MEAN TOTAL ANNUAL GPP FOR EACH FIRE FREQUENCY CLASS
+// PART 2 - MEAN TOTAL DRY SEASON GPP FOR EACH FIRE FREQUENCY CLASS
+// PART 3 - MEAN TOTAL GROWING SEASON GPP FOR EACH FIRE FREQUENCY CLASS
+
+// ###########################################################################################################
+
+
+
+
+// *********************** PART 1 - MEAN TOTAL ANNUAL GPP FOR EACH FIRE FREQUENCY CLASS ***********************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION WITH ANNUAL TOTAL GPP AS PIXEL VALUE
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL GPP FOR EACH FIRE FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Study Area
+  var pantanal = table.geometry();
+  
+  // Area of the Pantanal
+  var areaP = pantanal.area().divide(1000000);
+  print('Pantanal area', areaP);
+  
+  // GPP Collection
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
+          .map(function (x) { return x.rename('GPP') });
+  print('GPPcollection', GPPcollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2001-01-01', '2020-12-31');
+  print('FIREcollection', FIREcollection);
+  
+  // MODIS projection
+  var projection = FIREcollection.first().projection();
+  
+  // MODIS scale
+  var scale = projection.nominalScale();
+
+
+/* 1 - CREATE AN IMAGE COLLECTION WITH ANNUAL TOTAL GPP AS PIXEL VALUE */
+
+  /** Create an Image Collection with annual SUM of the MOD17A3H.006 product **/
+
+        var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').first().propertyNames());
+        var GPP_image2002 = GPPcollection.select('GPP').filterDate('2002-01-01', '2002-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2002-01-01', '2002-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2002-01-01', '2002-12-31').first().propertyNames());
+        var GPP_image2003 = GPPcollection.select('GPP').filterDate('2003-01-01', '2003-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2003-01-01', '2003-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2003-01-01', '2003-12-31').first().propertyNames());
+        var GPP_image2004 = GPPcollection.select('GPP').filterDate('2004-01-01', '2004-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2004-01-01', '2004-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2004-01-01', '2004-12-31').first().propertyNames());
+        var GPP_image2005 = GPPcollection.select('GPP').filterDate('2005-01-01', '2005-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2005-01-01', '2005-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2005-01-01', '2005-12-31').first().propertyNames());
+        var GPP_image2006 = GPPcollection.select('GPP').filterDate('2006-01-01', '2006-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2006-01-01', '2006-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2006-01-01', '2006-12-31').first().propertyNames());
+        var GPP_image2007 = GPPcollection.select('GPP').filterDate('2007-01-01', '2007-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2007-01-01', '2007-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2007-01-01', '2007-12-31').first().propertyNames());
+        var GPP_image2008 = GPPcollection.select('GPP').filterDate('2008-01-01', '2008-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2008-01-01', '2008-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2008-01-01', '2008-12-31').first().propertyNames());
+        var GPP_image2009 = GPPcollection.select('GPP').filterDate('2009-01-01', '2009-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2009-01-01', '2009-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2009-01-01', '2009-12-31').first().propertyNames());
+        var GPP_image2010 = GPPcollection.select('GPP').filterDate('2010-01-01', '2010-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2010-01-01', '2010-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2010-01-01', '2010-12-31').first().propertyNames());
+        var GPP_image2011 = GPPcollection.select('GPP').filterDate('2011-01-01', '2011-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2011-01-01', '2011-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2011-01-01', '2011-12-31').first().propertyNames());
+        var GPP_image2012 = GPPcollection.select('GPP').filterDate('2012-01-01', '2012-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2012-01-01', '2012-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2012-01-01', '2012-12-31').first().propertyNames());
+        var GPP_image2013 = GPPcollection.select('GPP').filterDate('2013-01-01', '2013-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2013-01-01', '2013-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2013-01-01', '2013-12-31').first().propertyNames());
+        var GPP_image2014 = GPPcollection.select('GPP').filterDate('2014-01-01', '2014-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2014-01-01', '2014-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2014-01-01', '2014-12-31').first().propertyNames());
+        var GPP_image2015 = GPPcollection.select('GPP').filterDate('2015-01-01', '2015-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2015-01-01', '2015-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2015-01-01', '2015-12-31').first().propertyNames());
+        var GPP_image2016 = GPPcollection.select('GPP').filterDate('2016-01-01', '2016-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2016-01-01', '2016-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2016-01-01', '2016-12-31').first().propertyNames());
+        var GPP_image2017 = GPPcollection.select('GPP').filterDate('2017-01-01', '2017-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2017-01-01', '2017-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2017-01-01', '2017-12-31').first().propertyNames());
+        var GPP_image2018 = GPPcollection.select('GPP').filterDate('2018-01-01', '2018-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2018-01-01', '2018-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2018-01-01', '2018-12-31').first().propertyNames());
+        var GPP_image2019 = GPPcollection.select('GPP').filterDate('2019-01-01', '2019-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2019-01-01', '2019-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2019-01-01', '2019-12-31').first().propertyNames());
+        var GPP_image2020 = GPPcollection.select('GPP').filterDate('2020-01-01', '2020-12-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2020-01-01', '2020-12-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2020-01-01', '2020-12-31').first().propertyNames());
+      
+        var GPP_imageList = [GPP_image2001,
+                        GPP_image2002,
+                        GPP_image2003,
+                        GPP_image2004,
+                        GPP_image2005,
+                        GPP_image2006,
+                        GPP_image2007,
+                        GPP_image2008,
+                        GPP_image2009,
+                        GPP_image2010,
+                        GPP_image2011,
+                        GPP_image2012,
+                        GPP_image2013,
+                        GPP_image2014,
+                        GPP_image2015,
+                        GPP_image2016,
+                        GPP_image2017,
+                        GPP_image2018,
+                        GPP_image2019,
+                        GPP_image2020];
+                      
+        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+
+        var GPPaggregate = MOD17A2H_annualmeans
+              .mean()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('GPP').rename('Mean_GPP');
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the flood aggregate **/
+        var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL GPP FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.min(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.max(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding total GPP mean
+            **/
+  
+      /*** Create the function that returns the fire frequency ***/
+      function giveClassMeanGPP (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var MeanGPP = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var StandardDeviation = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var pixelcount = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('Mean_GPP');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'Mean_Annual_GPP': MeanGPP,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var MeanAnnualSumGPP_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanAnnualSumGPP_perFireFrequencyClass', MeanAnnualSumGPP_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+
+
+  /** Export the collection **/
+  // Export.table.toDrive({
+  //   collection: MeanAnnualSumGPP_perFireFrequencyClass,
+  //   description: 'MeanAnnualSumGPP_perFireFrequencyClass_withMask',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'MeanAnnualSumGPP_perFireFrequencyClass_withMask'
+  // });
+
+
+// ###################################################################################################################################
+
+
+
+// *********************** PART 2 - MEAN TOTAL DRY SEASON GPP FOR EACH FIRE FREQUENCY CLASS ***********************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION WITH DRY SEASON TOTAL GPP AS PIXEL VALUE
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON GPP FOR EACH FIRE FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Study Area
+  var pantanal = table.geometry();
+  
+  // Area of the Pantanal
+  var areaP = pantanal.area().divide(1000000);
+  print('Pantanal area', areaP);
+  
+  // GPP Collection
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
+          .map(function (x) { return x.rename('GPP') });
+  print('GPPcollection', GPPcollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2001-01-01', '2020-12-31');
+  print('FIREcollection', FIREcollection);
+  
+  // MODIS projection
+  var projection = FIREcollection.first().projection();
+  
+  // MODIS scale
+  var scale = projection.nominalScale();
+
+
+/* 1 - CREATE AN IMAGE COLLECTION WITH DRY SEASON TOTAL GPP AS PIXEL VALUE */
+
+  /** Create an Image Collection with dry season mean of the MOD17A3H.006 product **/
+
+        var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-05-01', '2001-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2001-01-01', '2001-09-30').first().propertyNames());
+        var GPP_image2002 = GPPcollection.select('GPP').filterDate('2002-05-01', '2002-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2002-01-01', '2002-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2002-01-01', '2002-09-30').first().propertyNames());
+        var GPP_image2003 = GPPcollection.select('GPP').filterDate('2003-05-01', '2003-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2003-01-01', '2003-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2003-01-01', '2003-09-30').first().propertyNames());
+        var GPP_image2004 = GPPcollection.select('GPP').filterDate('2004-05-01', '2004-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2004-01-01', '2004-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2004-01-01', '2004-09-30').first().propertyNames());
+        var GPP_image2005 = GPPcollection.select('GPP').filterDate('2005-05-01', '2005-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2005-01-01', '2005-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2005-01-01', '2005-09-30').first().propertyNames());
+        var GPP_image2006 = GPPcollection.select('GPP').filterDate('2006-05-01', '2006-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2006-01-01', '2006-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2006-01-01', '2006-09-30').first().propertyNames());
+        var GPP_image2007 = GPPcollection.select('GPP').filterDate('2007-05-01', '2007-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2007-01-01', '2007-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2007-01-01', '2007-09-30').first().propertyNames());
+        var GPP_image2008 = GPPcollection.select('GPP').filterDate('2008-05-01', '2008-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2008-01-01', '2008-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2008-01-01', '2008-09-30').first().propertyNames());
+        var GPP_image2009 = GPPcollection.select('GPP').filterDate('2009-05-01', '2009-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2009-01-01', '2009-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2009-01-01', '2009-09-30').first().propertyNames());
+        var GPP_image2010 = GPPcollection.select('GPP').filterDate('2010-05-01', '2010-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2010-01-01', '2010-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2010-01-01', '2010-09-30').first().propertyNames());
+        var GPP_image2011 = GPPcollection.select('GPP').filterDate('2011-05-01', '2011-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2011-01-01', '2011-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2011-01-01', '2011-09-30').first().propertyNames());
+        var GPP_image2012 = GPPcollection.select('GPP').filterDate('2012-05-01', '2012-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2012-01-01', '2012-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2012-01-01', '2012-09-30').first().propertyNames());
+        var GPP_image2013 = GPPcollection.select('GPP').filterDate('2013-05-01', '2013-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2013-01-01', '2013-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2013-01-01', '2013-09-30').first().propertyNames());
+        var GPP_image2014 = GPPcollection.select('GPP').filterDate('2014-05-01', '2014-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2014-01-01', '2014-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2014-01-01', '2014-09-30').first().propertyNames());
+        var GPP_image2015 = GPPcollection.select('GPP').filterDate('2015-05-01', '2015-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2015-01-01', '2015-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2015-01-01', '2015-09-30').first().propertyNames());
+        var GPP_image2016 = GPPcollection.select('GPP').filterDate('2016-05-01', '2016-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2016-01-01', '2016-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2016-01-01', '2016-09-30').first().propertyNames());
+        var GPP_image2017 = GPPcollection.select('GPP').filterDate('2017-05-01', '2017-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2017-01-01', '2017-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2017-01-01', '2017-09-30').first().propertyNames());
+        var GPP_image2018 = GPPcollection.select('GPP').filterDate('2018-05-01', '2018-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2018-01-01', '2018-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2018-01-01', '2018-09-30').first().propertyNames());
+        var GPP_image2019 = GPPcollection.select('GPP').filterDate('2019-05-01', '2019-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2019-01-01', '2019-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2019-01-01', '2019-09-30').first().propertyNames());
+        var GPP_image2020 = GPPcollection.select('GPP').filterDate('2020-05-01', '2020-09-30').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2020-01-01', '2020-09-30').first(), 
+                            GPPcollection.select('GPP').filterDate('2020-01-01', '2020-09-30').first().propertyNames());
+    
+        var GPP_imageList = [GPP_image2001,
+                        GPP_image2002,
+                        GPP_image2003,
+                        GPP_image2004,
+                        GPP_image2005,
+                        GPP_image2006,
+                        GPP_image2007,
+                        GPP_image2008,
+                        GPP_image2009,
+                        GPP_image2010,
+                        GPP_image2011,
+                        GPP_image2012,
+                        GPP_image2013,
+                        GPP_image2014,
+                        GPP_image2015,
+                        GPP_image2016,
+                        GPP_image2017,
+                        GPP_image2018,
+                        GPP_image2019,
+                        GPP_image2020];
+                      
+        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+
+        var GPPaggregate = MOD17A2H_annualmeans
+              .mean()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('GPP').rename('Mean_GPP');
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the flood aggregate **/
+        var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON GPP FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.min(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.max(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding total GPP mean
+            **/
+  
+      /*** Create the function that returns the fire frequency ***/
+      function giveClassMeanGPP (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var MeanGPP = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var StandardDeviation = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var pixelcount = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('Mean_GPP');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'Mean_Annual_GPP': MeanGPP,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var MeanDrySeasonSumGPP_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanDrySeasonSumGPP_perFireFrequencyClass', MeanDrySeasonSumGPP_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+
+
+  /** Export the collection **/
+  Export.table.toDrive({
+    collection: MeanDrySeasonSumGPP_perFireFrequencyClass,
+    description: 'MeanDrySeasonSumGPP_perFireFrequencyClass_withMask',
+    folder: 'BCM2020-2021/Dissertation',
+    fileNamePrefix: 'MeanDrySeasonSumGPP_perFireFrequencyClass_withMask'
+  });
+
+
+
+
+// ###############################################################################################################################
+
+
+
+
+// *********************** PART 3 - MEAN TOTAL GROWING SEASON GPP FOR EACH FIRE FREQUENCY CLASS ***********************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION WITH GROWING SEASON GPP AVERAGE AS PIXEL VALUE
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON GPP FOR EACH FIRE FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Study Area
+  var pantanal = table.geometry();
+  
+  // Area of the Pantanal
+  var areaP = pantanal.area().divide(1000000);
+  print('Pantanal area', areaP);
+  
+  // GPP Collection
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
+          .map(function (x) { return x.rename('GPP') });
+  print('GPPcollection', GPPcollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2001-01-01', '2020-12-31');
+  print('FIREcollection', FIREcollection);
+  
+  // MODIS projection
+  var projection = FIREcollection.first().projection();
+  
+  // MODIS scale
+  var scale = projection.nominalScale();
+
+
+/* 1 - CREATE AN IMAGE COLLECTION OF GROWING SEASON GPP AVERAGE */
+
+  /** Create an Image Collection with growing season mean of the MOD17A3H.006 product **/
+
+        var GPP_image2001 = GPPcollection.select('GPP').filterDate('2000-11-01', '2001-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2001-01-01', '2001-05-31').first().propertyNames());
+        var GPP_image2002 = GPPcollection.select('GPP').filterDate('2001-11-01', '2002-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2002-01-01', '2002-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2002-01-01', '2002-05-31').first().propertyNames());
+        var GPP_image2003 = GPPcollection.select('GPP').filterDate('2002-11-01', '2003-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2003-01-01', '2003-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2003-01-01', '2003-05-31').first().propertyNames());
+        var GPP_image2004 = GPPcollection.select('GPP').filterDate('2003-11-01', '2004-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2004-01-01', '2004-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2004-01-01', '2004-05-31').first().propertyNames());
+        var GPP_image2005 = GPPcollection.select('GPP').filterDate('2004-11-01', '2005-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2005-01-01', '2005-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2005-01-01', '2005-05-31').first().propertyNames());
+        var GPP_image2006 = GPPcollection.select('GPP').filterDate('2005-11-01', '2006-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2006-01-01', '2006-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2006-01-01', '2006-05-31').first().propertyNames());
+        var GPP_image2007 = GPPcollection.select('GPP').filterDate('2006-11-01', '2007-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2007-01-01', '2007-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2007-01-01', '2007-05-31').first().propertyNames());
+        var GPP_image2008 = GPPcollection.select('GPP').filterDate('2007-11-01', '2008-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2008-01-01', '2008-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2008-01-01', '2008-05-31').first().propertyNames());
+        var GPP_image2009 = GPPcollection.select('GPP').filterDate('2008-11-01', '2009-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2009-01-01', '2009-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2009-01-01', '2009-05-31').first().propertyNames());
+        var GPP_image2010 = GPPcollection.select('GPP').filterDate('2009-11-01', '2010-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2010-01-01', '2010-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2010-01-01', '2010-05-31').first().propertyNames());
+        var GPP_image2011 = GPPcollection.select('GPP').filterDate('2010-11-01', '2011-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2011-01-01', '2011-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2011-01-01', '2011-05-31').first().propertyNames());
+        var GPP_image2012 = GPPcollection.select('GPP').filterDate('2011-11-01', '2012-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2012-01-01', '2012-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2012-01-01', '2012-05-31').first().propertyNames());
+        var GPP_image2013 = GPPcollection.select('GPP').filterDate('2012-11-01', '2013-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2013-01-01', '2013-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2013-01-01', '2013-05-31').first().propertyNames());
+        var GPP_image2014 = GPPcollection.select('GPP').filterDate('2013-11-01', '2014-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2014-01-01', '2014-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2014-01-01', '2014-05-31').first().propertyNames());
+        var GPP_image2015 = GPPcollection.select('GPP').filterDate('2014-11-01', '2015-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2015-01-01', '2015-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2015-01-01', '2015-05-31').first().propertyNames());
+        var GPP_image2016 = GPPcollection.select('GPP').filterDate('2015-11-01', '2016-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2016-01-01', '2016-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2016-01-01', '2016-05-31').first().propertyNames());
+        var GPP_image2017 = GPPcollection.select('GPP').filterDate('2016-11-01', '2017-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2017-01-01', '2017-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2017-01-01', '2017-05-31').first().propertyNames());
+        var GPP_image2018 = GPPcollection.select('GPP').filterDate('2017-11-01', '2018-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2018-01-01', '2018-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2018-01-01', '2018-05-31').first().propertyNames());
+        var GPP_image2019 = GPPcollection.select('GPP').filterDate('2018-11-01', '2019-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2019-01-01', '2019-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2019-01-01', '2019-05-31').first().propertyNames());
+        var GPP_image2020 = GPPcollection.select('GPP').filterDate('2019-11-01', '2020-05-31').sum()
+            .copyProperties(GPPcollection.select('GPP').filterDate('2020-01-01', '2020-05-31').first(), 
+                            GPPcollection.select('GPP').filterDate('2020-01-01', '2020-05-31').first().propertyNames());
+        var GPP_imageList = [GPP_image2001,
+                        GPP_image2002,
+                        GPP_image2003,
+                        GPP_image2004,
+                        GPP_image2005,
+                        GPP_image2006,
+                        GPP_image2007,
+                        GPP_image2008,
+                        GPP_image2009,
+                        GPP_image2010,
+                        GPP_image2011,
+                        GPP_image2012,
+                        GPP_image2013,
+                        GPP_image2014,
+                        GPP_image2015,
+                        GPP_image2016,
+                        GPP_image2017,
+                        GPP_image2018,
+                        GPP_image2019,
+                        GPP_image2020];
+                      
+        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+
+        var GPPaggregate = MOD17A2H_annualmeans
+              .mean()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('GPP').rename('Mean_GPP');
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({
+                  crs: projection, 
+                  scale: scale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum()
+              .clip(pantanal)
+              .reproject({crs: 
+                projection, 
+                scale: scale
+              })
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the flood aggregate **/
+        var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON GPP FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.min(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.max(),
+                geometry: pantanal,
+                crs: projection
+              })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding total GPP mean
+            **/
+  
+      /*** Create the function that returns the fire frequency ***/
+      function giveClassMeanGPP (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var MeanGPP = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var StandardDeviation = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: projection,
+              scale: scale,
+              geometry: pantanal
+            })
+            .get('Mean_GPP');
+        var pixelcount = classOI
+            .select('Mean_GPP')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: projection,
+              scale: scale
+            })
+            .get('Mean_GPP');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'Mean_Annual_GPP': MeanGPP,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var MeanGrowingSeasonSumGPP_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanGrowingSeasonSumGPP_perFireFrequencyClass', MeanGrowingSeasonSumGPP_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+
+
+  /** Export the collection **/
+  // Export.table.toDrive({
+  //   collection: MeanGrowingSeasonSumGPP_perFireFrequencyClass,
+  //   description: 'MeanGrowingSeasonSumGPP_perFireFrequencyClass_withMask',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'MeanGrowingSeasonSumGPP_perFireFrequencyClass_withMask'
+  // });
+
