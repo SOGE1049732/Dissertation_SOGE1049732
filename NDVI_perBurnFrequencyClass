@@ -9,7 +9,7 @@
 
 
 
-// *********************** PART 1 - MEAN OVERALL NDVI FOR EACH FIRE FREQUENCY CLASS ***********************
+// *********************** PART 1 - MEAN OVERALL NDVI FOR EACH BURN FREQUENCY CLASS ***********************
 
 
 // -------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@
   // 1 - CREATE AN IMAGE COLLECTION WITH ANNUAL NDVI AVERAGE AS PIXEL VALUE
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL NDVI FOR EACH FIRE FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL NDVI FOR EACH BURN FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -99,7 +99,6 @@
                   scale: scale
                 });
               });
-            // because ee.Reducer changes the projection
         print('MCD13A1_pixelannualmean - Collection', MCD13A1_pixelannualmean);
 
         var NDVIaggregate = MCD13A1_pixelannualmean
@@ -115,12 +114,6 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
         
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
@@ -186,13 +179,12 @@
                   scale: scale
                 });
               });
-            // because ee.Reducer changes the projection
         print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
 
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum()
               .clip(pantanal)
               .reproject({crs: 
@@ -207,15 +199,15 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the burn aggregate **/
+      // Add the fire aggregate image as a band to the NDVI aggregate **/
         var combined_aggregate = NDVIaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL NDVI FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL NDVI FOR EACH BURN FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification')
@@ -242,14 +234,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding NDVI mean
+            - the corresponding mean NDVI
             **/
   
-      /*** Create the function that returns the burn frequency ***/
+      /*** Create the function that returns the mean NDVI for each class ***/
       function giveClassMeanNDVI (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var MeanNDVI = classOI
             .select('Mean_NDVI')
             .reduceRegion({
@@ -294,7 +286,7 @@
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the fire frequency for each class **/
+  /** Create a graph of showing the mean NDVI for each class **/
   var graph = ui.Chart.feature.byFeature(MeanAnnualNDVI_perFireFrequencyClass, 'Class', 'Mean_Annual_NDVI');
   var graph2 = ui.Chart.feature.byFeature(MeanAnnualNDVI_perFireFrequencyClass, 'Class', 'Standard_Deviation');
   
@@ -321,7 +313,7 @@
 
 
 
-// *********************** PART 2 - MEAN DRY SEASON NDVI FOR EACH FIRE FREQUENCY CLASS ***********************
+// *********************** PART 2 - MEAN DRY SEASON NDVI FOR EACH BURN FREQUENCY CLASS ***********************
 
 
 
@@ -332,7 +324,7 @@
   // 1 - CREATE AN IMAGE COLLECTION WITH DRY SEASON AVERAGE NDVI AS PIXEL VALUE
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON NDVI FOR EACH FIRE FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON NDVI FOR EACH BURN FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -410,7 +402,6 @@
               .map(function (x) {
                 return x.reproject({crs: projection, scale: scale});
                 });
-            // because ee.Reducer changes the projection
         print('MCD13A1_pixeldryseasonmean - Collection', MCD13A1_pixeldryseasonmean);
 
         var NDVIaggregate = MCD13A1_pixeldryseasonmean
@@ -422,13 +413,7 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
-        
+
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
           var band = input.select('BurnDate')
@@ -490,7 +475,6 @@
               .map(function (x) {
                 return x.reproject({crs: projection, scale: scale});
                 });
-            // because ee.Reducer changes the projection
         print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
 
  
@@ -507,15 +491,15 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the burn aggregate **/
+      // Add the fire aggregate image as a band to the NDVI aggregate **/
         var combined_aggregate = NDVIaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON NDVI FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON NDVI FOR EACH BURN FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification').reduceRegion({
@@ -540,14 +524,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding dry season mean NDVI
+            - the corresponding mean dry season NDVI
             **/
   
-      /*** Create the function that returns the burn frequency ***/
+      /*** Create the function that returns the mean NDVI for each class ***/
       function giveClassMeanNDVI (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var MeanNDVI = classOI.select('Mean_NDVI').reduceRegion({
           reducer: ee.Reducer.mean(),
           crs: projection,
@@ -588,7 +572,7 @@
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the fire frequency for each class **/
+  /** Create a graph of showing the mean NDVI for each class **/
   var graph = ui.Chart.feature.byFeature(MeanDrySeasonNDVI_perFireFrequencyClass, 'Class', 'Mean_DrySeason_NDVI');
   var graph2 = ui.Chart.feature.byFeature(MeanDrySeasonNDVI_perFireFrequencyClass, 'Class', 'Standard_Deviation');
   
@@ -608,3 +592,6 @@
   //   folder: 'BCM2020-2021/Dissertation',
   //   fileNamePrefix: 'MeanDrySeasonNDVI_perFireFrequencyClass'
   // });
+
+
+
