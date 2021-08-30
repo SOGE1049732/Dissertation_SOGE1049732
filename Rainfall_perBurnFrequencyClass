@@ -1,0 +1,1052 @@
+// ###########################################################################################################
+
+
+
+
+// ******************* PART 1 - CORRELATION BETWEEN ANNUAL RAINFALL AND BURN FREQUENCY CLASS *******************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON RAINFALL
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH FIRE FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Area of Interest
+  var pantanal = table.geometry();
+  
+  // Rainfall Collection
+  var CHIRPScollection = imageCollection.select('precipitation'); //print('CHIRPScollection', CHIRPScollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2000-11-01', '2020-12-31'); //print('FIREcollection', FIREcollection);
+  
+  // MODIS Projection
+  var MODISprojection = FIREcollection.first().projection(); //print('MODIS projection', MODISprojection);
+  
+  // MODIS Scale
+  var MODISscale = MODISprojection.nominalScale(); //print('MODIS scale', MODISscale);
+  
+  // CHIRPS projection
+  var CHIRPSprojection = CHIRPScollection.first().projection(); //print('CHIRPS projection', CHIRPSprojection);
+  
+  // CHIRPS scale
+  var CHIRPSscale = CHIRPSprojection.nominalScale(); //print('CHIRPS scale', CHIRPSscale);
+
+
+/* 1 - CREATE AN IMAGE COLLECTION OF ANNUAL RAINFALL  */
+
+  /** Create an Image Collection with annual sum of the CHIRPS product (beginning of the year = beginning of the wet season **/
+
+        var CHIRPSimage2001 = CHIRPScollection.select('precipitation').filterDate('2000-11-01', '2001-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-12-31').first().propertyNames());
+        var CHIRPSimage2002 = CHIRPScollection.select('precipitation').filterDate('2001-11-01', '2002-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-12-31').first().propertyNames());
+        var CHIRPSimage2003 = CHIRPScollection.select('precipitation').filterDate('2002-11-01', '2003-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-12-31').first().propertyNames());
+        var CHIRPSimage2004 = CHIRPScollection.select('precipitation').filterDate('2003-11-01', '2004-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-12-31').first().propertyNames());
+        var CHIRPSimage2005 = CHIRPScollection.select('precipitation').filterDate('2004-11-01', '2005-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-12-31').first().propertyNames());
+        var CHIRPSimage2006 = CHIRPScollection.select('precipitation').filterDate('2005-11-01', '2006-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-12-31').first().propertyNames());
+        var CHIRPSimage2007 = CHIRPScollection.select('precipitation').filterDate('2006-11-01', '2007-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-12-31').first().propertyNames());
+        var CHIRPSimage2008 = CHIRPScollection.select('precipitation').filterDate('2007-11-01', '2008-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-12-31').first().propertyNames());
+        var CHIRPSimage2009 = CHIRPScollection.select('precipitation').filterDate('2008-11-01', '2009-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-12-31').first().propertyNames());
+        var CHIRPSimage2010 = CHIRPScollection.select('precipitation').filterDate('2009-11-01', '2010-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-12-31').first().propertyNames());
+        var CHIRPSimage2011 = CHIRPScollection.select('precipitation').filterDate('2010-11-01', '2011-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-12-31').first().propertyNames());
+        var CHIRPSimage2012 = CHIRPScollection.select('precipitation').filterDate('2011-11-01', '2012-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-12-31').first().propertyNames());
+        var CHIRPSimage2013 = CHIRPScollection.select('precipitation').filterDate('2012-11-01', '2013-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-12-31').first().propertyNames());
+        var CHIRPSimage2014 = CHIRPScollection.select('precipitation').filterDate('2013-11-01', '2014-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-12-31').first().propertyNames());
+        var CHIRPSimage2015 = CHIRPScollection.select('precipitation').filterDate('2014-11-01', '2015-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-12-31').first().propertyNames());
+        var CHIRPSimage2016 = CHIRPScollection.select('precipitation').filterDate('2015-11-01', '2016-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-12-31').first().propertyNames());
+        var CHIRPSimage2017 = CHIRPScollection.select('precipitation').filterDate('2016-11-01', '2017-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-12-31').first().propertyNames());
+        var CHIRPSimage2018 = CHIRPScollection.select('precipitation').filterDate('2017-11-01', '2018-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-12-31').first().propertyNames());
+        var CHIRPSimage2019 = CHIRPScollection.select('precipitation').filterDate('2018-11-01', '2019-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-12-31').first().propertyNames());
+        var CHIRPSimage2020 = CHIRPScollection.select('precipitation').filterDate('2019-11-01', '2020-11-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-12-31').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-12-31').first().propertyNames());
+
+        var CHIRPSimageList = [CHIRPSimage2001,
+                        CHIRPSimage2002,
+                        CHIRPSimage2003,
+                        CHIRPSimage2004,
+                        CHIRPSimage2005,
+                        CHIRPSimage2006,
+                        CHIRPSimage2007,
+                        CHIRPSimage2008,
+                        CHIRPSimage2009,
+                        CHIRPSimage2010,
+                        CHIRPSimage2011,
+                        CHIRPSimage2012,
+                        CHIRPSimage2013,
+                        CHIRPSimage2014,
+                        CHIRPSimage2015,
+                        CHIRPSimage2016,
+                        CHIRPSimage2017,
+                        CHIRPSimage2018,
+                        CHIRPSimage2019,
+                        CHIRPSimage2020];
+                        
+        var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({crs: CHIRPSprojection, scale: CHIRPSscale});
+                });
+            // because ee.Reducer changes the projection
+        print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
+        
+        var CHIRPSaggregate = CHIRPS_annualcomposites
+              .mean()
+              .clip(pantanal)
+              .reproject({
+                crs: CHIRPSprojection, 
+                scale: CHIRPSscale
+              })
+              .select('precipitation').rename('Mean_Rainfall');
+
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({
+                  crs: MODISprojection, 
+                  scale: MODISscale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum()
+              .clip(pantanal)
+              .reproject({
+                crs: MODISprojection, 
+                scale: MODISscale
+              })
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the burn aggregate **/
+        var combined_aggregate = CHIRPSaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.min(),
+                geometry: pantanal,
+                crs: MODISprojection
+              })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.max(),
+                geometry: pantanal,
+                crs: MODISprojection
+              })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding mean rainfall
+            **/
+  
+      /*** Create the function that returns the burn frequency ***/
+      function giveClassMeanRainfall (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var MeanRainfall = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var StandardDeviation = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var pixelcount = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: MODISprojection,
+              scale: MODISscale
+            })
+            .get('Mean_Rainfall');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'Annual_Rainfall': MeanRainfall,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var SumAnnualRainfall_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanRainfall));
+      print('SumAnnualRainfall_perFireFrequencyClass', SumAnnualRainfall_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+  /** Create a graph of showing the fire frequency for each class **/
+  var graph = ui.Chart.feature.byFeature(SumAnnualRainfall_perFireFrequencyClass, 'Class', 'Mean_Annual_Rainfall');
+  var graph2 = ui.Chart.feature.byFeature(SumAnnualRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
+  
+  print(graph.setChartType("ColumnChart")
+            .setOptions({vAxis: {title: 'Mean_Annual_Rainfall'},
+                          hAxis: {title: 'Class'}}));
+  
+  print(graph2.setChartType("ColumnChart")
+          .setOptions({vAxis: {title: 'Standard_Deviation'},
+                        hAxis: {title: 'Class'}}));
+
+  /** Export the collection **/
+  // Export.table.toDrive({
+  //   collection: SumAnnualRainfall_perFireFrequencyClass,
+  //   description: 'SumAnnualRainfall_perFireFrequencyClass',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'SumAnnualRainfall_perFireFrequencyClass'
+  // });
+
+
+// ######################################################################################################################"
+
+
+
+
+// ******************* PART 2 - CORRELATION BETWEEN DRY SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION OF ANNUAL RAINFALL
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON RAINFALL FOR EACH BURN FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Area of Interest
+  var pantanal = table.geometry();
+  
+  // Rainfall Collection
+  var CHIRPScollection = imageCollection.select('precipitation'); //print('CHIRPScollection', CHIRPScollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2000-11-01', '2020-12-31'); //print('FIREcollection', FIREcollection);
+  
+  // MODIS Projection
+  var MODISprojection = FIREcollection.first().projection(); //print('MODIS projection', MODISprojection);
+  
+  // MODIS Scale
+  var MODISscale = MODISprojection.nominalScale(); //print('MODIS scale', MODISscale);
+  
+  // CHIRPS projection
+  var CHIRPSprojection = CHIRPScollection.first().projection(); //print('CHIRPS projection', CHIRPSprojection);
+  
+  // CHIRPS scale
+  var CHIRPSscale = CHIRPSprojection.nominalScale(); //print('CHIRPS scale', CHIRPSscale);
+
+
+/* 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON (MAY-SEPTEMBER) RAINFALL AVERAGE */
+
+  /** Create an Image Collection with annual sum of the CHIRPS product **/
+
+        var CHIRPSimage2001 = CHIRPScollection.select('precipitation').filterDate('2001-05-01', '2001-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-09-30').first().propertyNames());
+        var CHIRPSimage2002 = CHIRPScollection.select('precipitation').filterDate('2002-05-01', '2002-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-09-30').first().propertyNames());
+        var CHIRPSimage2003 = CHIRPScollection.select('precipitation').filterDate('2003-05-01', '2003-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-09-30').first().propertyNames());
+        var CHIRPSimage2004 = CHIRPScollection.select('precipitation').filterDate('2004-05-01', '2004-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-09-30').first().propertyNames());
+        var CHIRPSimage2005 = CHIRPScollection.select('precipitation').filterDate('2005-05-01', '2005-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-09-30').first().propertyNames());
+        var CHIRPSimage2006 = CHIRPScollection.select('precipitation').filterDate('2006-05-01', '2006-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-09-30').first().propertyNames());
+        var CHIRPSimage2007 = CHIRPScollection.select('precipitation').filterDate('2007-05-01', '2007-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-09-30').first().propertyNames());
+        var CHIRPSimage2008 = CHIRPScollection.select('precipitation').filterDate('2008-05-01', '2008-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-09-30').first().propertyNames());
+        var CHIRPSimage2009 = CHIRPScollection.select('precipitation').filterDate('2009-05-01', '2009-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-09-30').first().propertyNames());
+        var CHIRPSimage2010 = CHIRPScollection.select('precipitation').filterDate('2010-05-01', '2010-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-09-30').first().propertyNames());
+        var CHIRPSimage2011 = CHIRPScollection.select('precipitation').filterDate('2011-05-01', '2011-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-09-30').first().propertyNames());
+        var CHIRPSimage2012 = CHIRPScollection.select('precipitation').filterDate('2012-05-01', '2012-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-09-30').first().propertyNames());
+        var CHIRPSimage2013 = CHIRPScollection.select('precipitation').filterDate('2013-05-01', '2013-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-09-30').first().propertyNames());
+        var CHIRPSimage2014 = CHIRPScollection.select('precipitation').filterDate('2014-05-01', '2014-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-09-30').first().propertyNames());
+        var CHIRPSimage2015 = CHIRPScollection.select('precipitation').filterDate('2015-05-01', '2015-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-09-30').first().propertyNames());
+        var CHIRPSimage2016 = CHIRPScollection.select('precipitation').filterDate('2016-05-01', '2016-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-09-30').first().propertyNames());
+        var CHIRPSimage2017 = CHIRPScollection.select('precipitation').filterDate('2017-05-01', '2017-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-09-30').first().propertyNames());
+        var CHIRPSimage2018 = CHIRPScollection.select('precipitation').filterDate('2018-05-01', '2018-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-09-30').first().propertyNames());
+        var CHIRPSimage2019 = CHIRPScollection.select('precipitation').filterDate('2019-05-01', '2019-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-09-30').first().propertyNames());
+        var CHIRPSimage2020 = CHIRPScollection.select('precipitation').filterDate('2020-05-01', '2020-09-30').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-09-30').first().propertyNames());
+  
+        var CHIRPSimageList = [CHIRPSimage2001,
+                        CHIRPSimage2002,
+                        CHIRPSimage2003,
+                        CHIRPSimage2004,
+                        CHIRPSimage2005,
+                        CHIRPSimage2006,
+                        CHIRPSimage2007,
+                        CHIRPSimage2008,
+                        CHIRPSimage2009,
+                        CHIRPSimage2010,
+                        CHIRPSimage2011,
+                        CHIRPSimage2012,
+                        CHIRPSimage2013,
+                        CHIRPSimage2014,
+                        CHIRPSimage2015,
+                        CHIRPSimage2016,
+                        CHIRPSimage2017,
+                        CHIRPSimage2018,
+                        CHIRPSimage2019,
+                        CHIRPSimage2020];
+                        
+        var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({crs: CHIRPSprojection, scale: CHIRPSscale});
+                });
+            // because ee.Reducer changes the projection
+        print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
+        
+        var CHIRPSaggregate = CHIRPS_annualcomposites
+              .mean()
+              .clip(pantanal)
+              .reproject({
+                crs: CHIRPSprojection, 
+                scale: CHIRPSscale
+              })
+              .select('precipitation').rename('Mean_Rainfall');
+        
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({crs: MODISprojection, scale: MODISscale});
+                });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum().clip(pantanal)
+              .reproject({crs: MODISprojection, scale: MODISscale})
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the burn aggregate **/
+        var combined_aggregate = CHIRPSaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification').reduceRegion({
+          reducer: ee.Reducer.min(),
+          geometry: pantanal,
+          crs: MODISprojection
+        })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Fires_Classification').reduceRegion({
+          reducer: ee.Reducer.max(),
+          geometry: pantanal,
+          crs: MODISprojection
+        })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding dry season mean rainfall
+            **/
+  
+      /*** Create the function that returns the burn frequency ***/
+      function giveClassMeanRainfall (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var Mean_Rainfall = classOI
+            .select('Mean_Rainfall').reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var StandardDeviation = classOI
+            .select('Mean_Rainfall').reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var pixelcount = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: MODISprojection,
+              scale: MODISscale
+            })
+            .get('Mean_Rainfall');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'DrySeason_Rainfall': Mean_Rainfall,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var SumDrySeasonRainfall_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanRainfall));
+      print('SumDrySeasonRainfall_perFireFrequencyClass', SumDrySeasonRainfall_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+  /** Create a graph of showing the fire frequency for each class **/
+  var graph = ui.Chart.feature.byFeature(SumDrySeasonRainfall_perFireFrequencyClass, 'Class', 'DrySeason_Rainfall');
+  var graph2 = ui.Chart.feature.byFeature(SumDrySeasonRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
+  
+  print(graph.setChartType("ColumnChart")
+            .setOptions({vAxis: {title: 'Mean_DrySeason_Rainfall'},
+                          hAxis: {title: 'Class'}}));
+  
+  print(graph2.setChartType("ColumnChart")
+          .setOptions({vAxis: {title: 'Standard_Deviation'},
+                        hAxis: {title: 'Class'}}));
+
+
+  /** Export the collection **/
+  // Export.table.toDrive({
+  //   collection: SumDrySeasonRainfall_perFireFrequencyClass,
+  //   description: 'SumDrySeasonRainfall_perFireFrequencyClass',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'SumDrySeasonRainfall_perFireFrequencyClass'
+  // });
+
+
+
+// ##########################################################################################################################"
+
+
+// ******************* PART 4 - CORRELATION BETWEEN WET SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AN IMAGE COLLECTION OF WET SEASON RAINFALL
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN WET SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Area of Interest
+  var pantanal = table.geometry();
+  
+  // Rainfall Collection
+  var CHIRPScollection = imageCollection.select('precipitation'); //print('CHIRPScollection', CHIRPScollection);
+  
+  // BA collection
+  var FIREcollection = imageCollection2.filterDate('2000-11-01', '2020-12-31'); //print('FIREcollection', FIREcollection);
+  
+  // MODIS Projection
+  var MODISprojection = FIREcollection.first().projection(); //print('MODIS projection', MODISprojection);
+  
+  // MODIS Scale
+  var MODISscale = MODISprojection.nominalScale(); //print('MODIS scale', MODISscale);
+  
+  // CHIRPS projection
+  var CHIRPSprojection = CHIRPScollection.first().projection(); //print('CHIRPS projection', CHIRPSprojection);
+  
+  // CHIRPS scale
+  var CHIRPSscale = CHIRPSprojection.nominalScale(); //print('CHIRPS scale', CHIRPSscale);
+
+
+/* 1 - CREATE AN IMAGE COLLECTION OF WET SEASON (NOVEMBER-MARCH) RAINFALL AVERAGE */
+
+  /** Create an Image Collection with annual sum of the CHIRPS product **/
+
+
+        var CHIRPSimage2001 = CHIRPScollection.select('precipitation').filterDate('2000-11-01', '2001-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-09-30').first().propertyNames());
+        var CHIRPSimage2002 = CHIRPScollection.select('precipitation').filterDate('2001-11-01', '2002-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2002-01-01', '2002-09-30').first().propertyNames());
+        var CHIRPSimage2003 = CHIRPScollection.select('precipitation').filterDate('2002-11-01', '2003-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2003-01-01', '2003-09-30').first().propertyNames());
+        var CHIRPSimage2004 = CHIRPScollection.select('precipitation').filterDate('2003-11-01', '2004-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2004-01-01', '2004-09-30').first().propertyNames());
+        var CHIRPSimage2005 = CHIRPScollection.select('precipitation').filterDate('2004-11-01', '2005-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2005-01-01', '2005-09-30').first().propertyNames());
+        var CHIRPSimage2006 = CHIRPScollection.select('precipitation').filterDate('2005-11-01', '2006-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2006-01-01', '2006-09-30').first().propertyNames());
+        var CHIRPSimage2007 = CHIRPScollection.select('precipitation').filterDate('2006-11-01', '2007-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2007-01-01', '2007-09-30').first().propertyNames());
+        var CHIRPSimage2008 = CHIRPScollection.select('precipitation').filterDate('2007-11-01', '2008-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2008-01-01', '2008-09-30').first().propertyNames());
+        var CHIRPSimage2009 = CHIRPScollection.select('precipitation').filterDate('2008-11-01', '2009-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2009-01-01', '2009-09-30').first().propertyNames());
+        var CHIRPSimage2010 = CHIRPScollection.select('precipitation').filterDate('2009-11-01', '2010-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2010-01-01', '2010-09-30').first().propertyNames());
+        var CHIRPSimage2011 = CHIRPScollection.select('precipitation').filterDate('2010-11-01', '2011-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2011-01-01', '2011-09-30').first().propertyNames());
+        var CHIRPSimage2012 = CHIRPScollection.select('precipitation').filterDate('2011-11-01', '2012-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2012-01-01', '2012-09-30').first().propertyNames());
+        var CHIRPSimage2013 = CHIRPScollection.select('precipitation').filterDate('2012-11-01', '2013-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2013-01-01', '2013-09-30').first().propertyNames());
+        var CHIRPSimage2014 = CHIRPScollection.select('precipitation').filterDate('2013-11-01', '2014-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2014-01-01', '2014-09-30').first().propertyNames());
+        var CHIRPSimage2015 = CHIRPScollection.select('precipitation').filterDate('2014-11-01', '2015-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2015-01-01', '2015-09-30').first().propertyNames());
+        var CHIRPSimage2016 = CHIRPScollection.select('precipitation').filterDate('2015-11-01', '2016-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2016-01-01', '2016-09-30').first().propertyNames());
+        var CHIRPSimage2017 = CHIRPScollection.select('precipitation').filterDate('2016-11-01', '2017-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2017-01-01', '2017-09-30').first().propertyNames());
+        var CHIRPSimage2018 = CHIRPScollection.select('precipitation').filterDate('2017-11-01', '2018-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2018-01-01', '2018-09-30').first().propertyNames());
+        var CHIRPSimage2019 = CHIRPScollection.select('precipitation').filterDate('2018-11-01', '2019-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2019-01-01', '2019-09-30').first().propertyNames());
+        var CHIRPSimage2020 = CHIRPScollection.select('precipitation').filterDate('2019-11-01', '2020-03-31').sum()
+              .copyProperties(CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-09-30').first(),
+                              CHIRPScollection.select('precipitation').filterDate('2020-01-01', '2020-09-30').first().propertyNames());
+        var CHIRPSimageList = [CHIRPSimage2001,
+                        CHIRPSimage2002,
+                        CHIRPSimage2003,
+                        CHIRPSimage2004,
+                        CHIRPSimage2005,
+                        CHIRPSimage2006,
+                        CHIRPSimage2007,
+                        CHIRPSimage2008,
+                        CHIRPSimage2009,
+                        CHIRPSimage2010,
+                        CHIRPSimage2011,
+                        CHIRPSimage2012,
+                        CHIRPSimage2013,
+                        CHIRPSimage2014,
+                        CHIRPSimage2015,
+                        CHIRPSimage2016,
+                        CHIRPSimage2017,
+                        CHIRPSimage2018,
+                        CHIRPSimage2019,
+                        CHIRPSimage2020];
+                        
+        var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
+              // .map(function (x) {return x.set('system:id', ee.String(x))})
+              .map(function (y) {
+                return y.reproject({
+                  crs: CHIRPSprojection, 
+                  scale: CHIRPSscale
+                });
+              });
+            // because ee.Reducer changes the projection
+        print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
+
+        var CHIRPSaggregate = CHIRPS_annualcomposites
+              .mean()
+              .clip(pantanal)
+              .reproject({
+                crs: CHIRPSprojection, 
+                scale: CHIRPSscale
+              })
+              .select('precipitation').rename('Mean_Rainfall');
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+  /** Add a classification band to the image collection **/
+          /* this classifcation band attributes 
+                1 to burned area ('BurnDate': 1)
+                0 to unburned areas ('BurnDate': 0),
+                  to unmapped areas ('BurnDate': -1),
+                  and to water areas ('BurnDate': -2).
+                  */
+        
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = FIREcollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({crs: MODISprojection, scale: MODISscale});
+                });
+            // because ee.Reducer changes the projection
+        print('MCD64A1.006 Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+              .sum().clip(pantanal)
+              .reproject({crs: MODISprojection, scale: MODISscale})
+              .select('Classification').rename('Fires_Classification');
+        var FireClassificationAggregate = FireClassificationAgg
+              .where(FireClassificationAgg.select('Fires_Classification').gte(13), 13);
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the brun aggregate **/
+        var combined_aggregate = CHIRPSaggregate.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+        var test = combined_aggregate
+            .updateMask(combined_aggregate.select('Fires_Classification').eq(ee.Number(1)))
+            .select('Mean_Rainfall')
+            .clip(pantanal);
+        print(test)
+        Map.addLayer(test)
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN GROWING SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+
+  /** Create a list of all the FIRE frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.min(),
+                geometry: pantanal,
+                crs: MODISprojection
+              })
+              .get('Fires_Classification'); //print('min', min);
+        
+        // Get max value
+              var max = combined_aggregate.select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.max(),
+                geometry: pantanal,
+                crs: MODISprojection
+              })
+              .get('Fires_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of fire frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding mean rainfall
+            **/
+  
+      /*** Create the function that returns the burn frequency ***/
+      function giveClassMeanRainfall (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
+          ); // mask applies to all bands (necessary for next step)
+        var MeanRainfall= classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.mean(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var StandardDeviation = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.stdDev(),
+              crs: MODISprojection,
+              scale: MODISscale,
+              geometry: pantanal
+            })
+            .get('Mean_Rainfall');
+        var pixelcount = classOI
+            .select('Mean_Rainfall')
+            .reduceRegion({
+              reducer: ee.Reducer.count(),
+              geometry: pantanal,
+              crs: MODISprojection,
+              scale: MODISscale
+            })
+            .get('Mean_Rainfall');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'WetSeason_Rainfall': MeanRainfall,
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_pixels': pixelcount
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var SumWetSeasonRainfall_perFireFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanRainfall));
+      print('SumWetSeasonRainfall_perFireFrequencyClass', SumWetSeasonRainfall_perFireFrequencyClass);
+
+
+
+/* 5 - VISUALIZE THE RESULTS */
+
+  /** Create a graph of showing the fire frequency for each class **/
+  var graph = ui.Chart.feature.byFeature(SumWetSeasonRainfall_perFireFrequencyClass, 'Class', 'WetSeason_Rainfall');
+  var graph2 = ui.Chart.feature.byFeature(SumWetSeasonRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
+  
+  print(graph.setChartType("ColumnChart")
+          .setOptions({
+                    vAxis: {title: 'Mean_WetSeason_Rainfall'},
+                    hAxis: {title: 'Class'}
+          })
+        );
+            
+  print(graph2.setChartType("ColumnChart")
+          .setOptions({
+                    vAxis: {title: 'Standard_Deviation'},
+                    hAxis: {title: 'Class'}
+          })
+        );
+
+  /** Export the collection **/                        
+  // Export.table.toDrive({
+  //   collection: SumWetSeasonRainfall_perFireFrequencyClass,
+  //   description: 'SumWetSeasonRainfall_perFireFrequencyClass',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'SumWetSeasonRainfall_perFireFrequencyClass'
+  // });
+
+
