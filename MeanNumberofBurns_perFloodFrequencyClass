@@ -1,0 +1,268 @@
+
+
+// ************************** MEAN BURN FREQUENCY PER FLOODING CLASS ***************************************
+
+
+// -------------------------------------------------------------------------------------------------
+
+/*** PLAN ***/
+  // 0 - IMPORTS
+  // 1 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FLOOD EVENTS FOR EACH PIXEL
+  // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
+  // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE NUMBER OF FIRE EVENTS OF EACH FLOOD CATEGORY
+  // 5 - VISUALIZE THE RESULTS
+
+// -------------------------------------------------------------------------------------------------  
+  
+  
+/* 0- IMPORTS */
+
+  // Study Area
+  var pantanal = table.geometry();
+  
+  // Area of the Pantanal
+  var areaP = pantanal.area().divide(1000000);
+  print('Pantanal area', areaP);
+  
+  // Image Collections
+  var MODIScollection = imageCollection;
+  var collection = imageCollection3;
+  print('Collection', collection);
+  
+  // MODIS projection
+  var projection = MODIScollection.first().projection();
+  
+  // MODIS scale
+  var scale = MODIScollection.first().projection().nominalScale();
+
+
+
+/* 1 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FLOOD EVENTS FOR EACH PIXEL */
+
+    // Create an aggregate image that gives each pixel the value of the number of flood events over the time-period OI **/
+ 
+        var aggregate_withoutArea = collection.select('Classification')
+              .map(function (x) {return x.unmask(0)})
+              .sum()
+              .reproject({crs: projection, scale: scale})
+              .select('Classification').rename('Floods_Classification')
+              .clip(pantanal);
+
+
+
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+
+
+  /** Add a classification band to the image collection **/
+
+        // Create a function that adds a classification band
+        function add_ClassificationBand (input) {
+          var band = input.select('BurnDate')
+          .updateMask(input.select('BurnDate').gt(0))
+          .where(input.select('BurnDate').gt(0), 1)
+          .rename('Classification');
+          return input.addBands(band);
+        }
+        
+        // Add the band to the entire collection
+        var Classified_Collection = MODIScollection.map(add_ClassificationBand);
+          print('CC', Classified_Collection);
+  
+  /** Create an Image Collection with annual composites of the MCD64A1.006 BA product **/
+        // This avoids potential double-counting of the same fire scars during the same year
+        var image2001 = Classified_Collection.select('Classification').filterDate('2001-01-01', '2001-12-31').mosaic();
+        var image2002 = Classified_Collection.select('Classification').filterDate('2002-01-01', '2002-12-31').mosaic();
+        var image2003 = Classified_Collection.select('Classification').filterDate('2003-01-01', '2003-12-31').mosaic();
+        var image2004 = Classified_Collection.select('Classification').filterDate('2004-01-01', '2004-12-31').mosaic();
+        var image2005 = Classified_Collection.select('Classification').filterDate('2005-01-01', '2005-12-31').mosaic();
+        var image2006 = Classified_Collection.select('Classification').filterDate('2006-01-01', '2006-12-31').mosaic();
+        var image2007 = Classified_Collection.select('Classification').filterDate('2007-01-01', '2007-12-31').mosaic();
+        var image2008 = Classified_Collection.select('Classification').filterDate('2008-01-01', '2008-12-31').mosaic();
+        var image2009 = Classified_Collection.select('Classification').filterDate('2009-01-01', '2009-12-31').mosaic();
+        var image2010 = Classified_Collection.select('Classification').filterDate('2010-01-01', '2010-12-31').mosaic();
+        var image2011 = Classified_Collection.select('Classification').filterDate('2011-01-01', '2011-12-31').mosaic();
+        var image2012 = Classified_Collection.select('Classification').filterDate('2012-01-01', '2012-12-31').mosaic();
+        var image2013 = Classified_Collection.select('Classification').filterDate('2013-01-01', '2013-12-31').mosaic();
+        var image2014 = Classified_Collection.select('Classification').filterDate('2014-01-01', '2014-12-31').mosaic();
+        var image2015 = Classified_Collection.select('Classification').filterDate('2015-01-01', '2015-12-31').mosaic();
+        var image2016 = Classified_Collection.select('Classification').filterDate('2016-01-01', '2016-12-31').mosaic();
+        var image2017 = Classified_Collection.select('Classification').filterDate('2017-01-01', '2017-12-31').mosaic();
+        var image2018 = Classified_Collection.select('Classification').filterDate('2018-01-01', '2018-12-31').mosaic();
+        var image2019 = Classified_Collection.select('Classification').filterDate('2019-01-01', '2019-12-31').mosaic();
+        var image2020 = Classified_Collection.select('Classification').filterDate('2020-01-01', '2020-12-31').mosaic();
+        
+        var ImageList = [image2001,
+                        image2002,
+                        image2003,
+                        image2004,
+                        image2005,
+                        image2006,
+                        image2007,
+                        image2008,
+                        image2009,
+                        image2010,
+                        image2011,
+                        image2012,
+                        image2013,
+                        image2014,
+                        image2015,
+                        image2016,
+                        image2017,
+                        image2018,
+                        image2019,
+                        image2020];
+                        
+        var MCD64A1_annualcomposites = ee.ImageCollection(ImageList)
+              .map(function (x) {
+                return x.reproject({crs: projection, scale: scale});
+                });
+            // because ee.Reducer changes the projection
+        print('Annual Composites - Collection', MCD64A1_annualcomposites);
+
+ 
+  /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
+ 
+        var FireClassificationAggregate = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) 
+              .sum().clip(pantanal)
+              .reproject({
+                crs: projection, 
+                scale: scale
+              })
+              .select('Classification')
+              .rename('Fires_Classification');
+
+
+  
+/* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
+
+      // Add the fire aggregate image as a band to the flood aggregate **/
+        var combined_aggregate = aggregate_withoutArea.addBands(FireClassificationAggregate);
+        print('combined_aggregate', combined_aggregate);
+
+
+
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE NUMBER OF BURN EVENTS OF EACH FLOOD CATEGORY */
+
+  /** Create a list of all the flood frequencies categories **/
+      
+        // Get min value
+        var min = combined_aggregate.select('Floods_Classification').reduceRegion({
+          reducer: ee.Reducer.min(),
+          geometry: pantanal,
+          crs: projection
+        })
+              .get('Floods_Classification'); //print('min', min);
+        
+        // Get max value
+        var max = combined_aggregate.select('Floods_Classification').reduceRegion({
+          reducer: ee.Reducer.max(),
+          geometry: pantanal,
+          crs: projection
+        })
+              .get('Floods_Classification'); //print('max', max);
+        
+        // Create the list of categories from min and max value
+        var listofclasses = ee.List.sequence(min, max);
+        print('List of flood frequency categories', listofclasses);
+
+  /** Create a function **/ 
+  /** that takes a class and returns a feature giving 
+            - the name of the class
+            - the corresponding mean number of burns
+            **/
+  
+      /*** Create the function that returns the mean number of burns for each flood frequency class ***/
+      function giveClassFireFrequency (x) {
+        var classOI = combined_aggregate.updateMask(
+          combined_aggregate.select('Floods_Classification').eq(ee.Number(x))
+          ); 
+        var FireFrequency = classOI
+              .select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.mean(),
+                crs: projection,
+                scale: scale,
+                geometry: pantanal
+              })
+              .get('Fires_Classification');
+        var StandardDeviation = classOI
+              .select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.stdDev(),
+                crs: projection,
+                scale: scale,
+                geometry: pantanal
+              })
+              .get('Fires_Classification');
+        var N_Pixels = classOI
+              .select('Fires_Classification')
+              .reduceRegion({
+                reducer: ee.Reducer.count(),
+                crs: projection,
+                scale: scale,
+                geometry: pantanal
+              })
+              .get('Fires_Classification');
+        var feature = ee.Feature(null, {
+                                    'Class': x,
+                                    'Fire_Frequency': FireFrequency,
+                                    'Fire_Return_Interval': ee.Number(MCD64A1_annualcomposites.size())
+                                                                .divide(FireFrequency),
+                                    'Standard_Deviation': StandardDeviation,
+                                    'N_Pixels': N_Pixels
+        });
+        return feature;
+      }
+      
+      // Apply the function to the list
+      var BurnFrequency_perFloodingFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassFireFrequency));
+      print('BurnFrequency_perFloodingFrequencyClass', BurnFrequency_perFloodingFrequencyClass);
+
+/* 5 - VISUALIZE THE RESULTS */
+
+  /** Create a graph of showing the fire frequency for each class **/
+  var graphMNF = ui.Chart.feature.byFeature(
+          BurnFrequency_perFloodingFrequencyClass, 
+          'Class', 
+          'Fire_Frequency'
+          );
+  var graphStdDev = ui.Chart.feature.byFeature(
+          BurnFrequency_perFloodingFrequencyClass, 
+          'Class', 
+          'Standard_Deviation'
+          );
+  
+  print(graphMNF.setChartType("ColumnChart")
+            .setOptions({
+                    vAxis: {title: 'Mean Number of Fires'},
+                    hAxis: {title: 'Flood Frequency Class'}
+            })
+        );
+
+  print(graphStdDev.setChartType("ColumnChart")
+            .setOptions({
+                    vAxis: {title: 'Standard Deviation'},
+                    hAxis: {title: 'Flood Frequency Class'}
+            })
+        );
+  
+  var graphMFRI = ui.Chart.feature.byFeature(
+          BurnFrequency_perFloodingFrequencyClass, 
+          'Class', 
+          'Fire_Return_Interval'
+          );
+  
+  print(graphMFRI.setChartType("ScatterChart")
+            .setOptions({vAxis: {title: 'Mean Fire Return Interval (years)'},
+                          hAxis: {title: 'Flood Frequency Class'}
+              
+            }));
+            
+  /** Export the collection **/
+  // Export.table.toDrive({
+  //   collection:BurnFrequency_perFloodingFrequencyClass,
+  //   description: 'BurnFrequency_perFloodingFrequencyClass',
+  //   folder: 'BCM2020-2021/Dissertation',
+  //   fileNamePrefix: 'BurnFrequency_perFloodingFrequencyClass'
+  // });
