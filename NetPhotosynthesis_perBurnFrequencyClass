@@ -253,7 +253,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -291,7 +291,7 @@
             - the corresponding Net Photosynthesis
             **/
   
-      /*** Create the function that returns the flood frequency ***/
+      /*** Create the function that returns the burn frequency ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
@@ -599,7 +599,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -637,7 +637,7 @@
             - the corresponding Net Photosynthesis mean
             **/
   
-      /*** Create the function that returns the flood frequency ***/
+      /*** Create the function that returns the burn frequency ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
@@ -947,7 +947,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -985,7 +985,7 @@
             - the corresponding Net Photosynthesis
             **/
   
-      /*** Create the function that returns the flood frequency ***/
+      /*** Create the function that returns the burn frequency ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
