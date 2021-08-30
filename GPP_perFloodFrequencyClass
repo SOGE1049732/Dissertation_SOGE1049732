@@ -1,25 +1,25 @@
 // ###########################################################################################################
 
-// PART 1 - MEAN TOTAL ANNUAL NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
-// PART 2 - MEAN TOTAL DRY SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
-// PART 3 - MEAN TOTAL GROWING SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
+// PART 1 - MEAN TOTAL ANNUAL GPP FOR EACH FLOOD FREQUENCY CLASS
+// PART 2 - MEAN TOTAL DRY SEASON GPP FOR EACH FLOOD FREQUENCY CLASS
+// PART 3 - MEAN TOTAL GROWING SEASON GPP FOR EACH FLOOD FREQUENCY CLASS
 
 // ###########################################################################################################
 
 
 
 
-// *********************** PART 1 - MEAN TOTAL ANNUAL NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS ***********************
+// *********************** PART 1 - MEAN TOTAL ANNUAL GPP FOR EACH FLOOD FREQUENCY CLASS ***********************
 
 
 // -------------------------------------------------------------------------------------------------
 
 /*** PLAN ***/
   // 0 - IMPORTS
-  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL ANNUAL NET PHOTOSYNTHESIS AS PIXEL VALUE
+  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL ANNUAL GPP AS PIXEL VALUE
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FLOOD EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL GPP FOR EACH FLOOD FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -36,8 +36,8 @@
   print('Pantanal area', areaP);
   
   // GPP Collection
-  var GPPcollection = imageCollection.select('PsnNet')
-          .map(function (x) { return x.updateMask(x.select('PsnNet').neq(0)) })
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
           .map(function (x) { return x.rename('GPP') });
   print('GPPcollection', GPPcollection);
   
@@ -52,9 +52,9 @@
   var scale = projection.nominalScale();
 
 
-/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL ANNUAL NET PHOTOSYNTHESIS AS PIXEL VALUE */
+/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL ANNUAL GPP AS PIXEL VALUE */
 
-  /** Create an Image Collection with annual sum of the MOD17A3H.006 product **/
+  /** Create an Image Collection with total annual of the MOD17A3H.006 product **/
 
         var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').first(), 
@@ -176,13 +176,13 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the flood aggregate image as a band to the flood aggregate **/
+      // Add the flood aggregate image as a band to the GPP aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FloodClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL GPP FOR EACH FLOOD FREQUENCY CLASS */
 
   /** Create a list of all the flood frequency categories **/
       
@@ -211,14 +211,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding mean total Net Photosynthesis
+            - the corresponding mean total GPP
             **/
   
-      /*** Create the function that returns the mean Net Photosynthesis for each class ***/
+      /*** Create the function that returns the mean total GPP for each frequency class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
               combined_aggregate.select('Flood_Classification').eq(ee.Number(x))
-              );
+              ); 
         var MeanSumGPP = classOI
               .select('Mean_SumGPP')
               .reduceRegion({
@@ -248,7 +248,7 @@
               .get('Mean_SumGPP');
         var feature = ee.Feature(null, {
                                     'Class': x,
-                                    'Mean_AnnualSum_PsnNet': MeanSumGPP,
+                                    'Mean_AnnualSum_GPP': MeanSumGPP,
                                     'Standard_Deviation': StandardDeviation,
                                     'N_Pixels': N_pixels
         });
@@ -256,16 +256,16 @@
       }
       
       // Apply the function to the list
-      var MeanAnnualSumPsnNet_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
-      print('MeanAnnualSumPsnNet_perFloodFrequencyClass', MeanAnnualSumPsnNet_perFloodFrequencyClass);
+      var MeanAnnualSumGPP_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanAnnualSumGPP_perFloodFrequencyClass', MeanAnnualSumGPP_perFloodFrequencyClass);
 
 
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the Net Photosynthesis for each class **/
-  // var graph = ui.Chart.feature.byFeature(MeanAnnualSumPsnNet_perFloodFrequencyClass, 'Class', 'Mean_AnnualSum_PsnNet');
-  // var graph2 = ui.Chart.feature.byFeature(MeanAnnualSumPsnNet_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
+  /** Create a graph of showing the GPP for each class **/
+  // var graph = ui.Chart.feature.byFeature(MeanAnnualSumGPP_perFloodFrequencyClass, 'Class', 'Mean_AnnualSum_GPP');
+  // var graph2 = ui.Chart.feature.byFeature(MeanAnnualSumGPP_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
   
   // print(graph.setChartType("ColumnChart")
   //         .setOptions({
@@ -283,10 +283,10 @@
     
   /** Export the collection **/
   // Export.table.toDrive({
-  //   collection: MeanAnnualSumPsnNet_perFloodFrequencyClass,
-  //   description: 'MeanAnnualSumPsnNet_perFloodFrequencyClass_withMask',
+  //   collection: MeanAnnualSumGPP_perFloodFrequencyClass,
+  //   description: 'MeanAnnualSumGPP_perFloodFrequencyClass_withMask',
   //   folder: 'BCM2020-2021/Dissertation',
-  //   fileNamePrefix: 'MeanAnnualSumPsnNet_perFloodFrequencyClass_withMask'
+  //   fileNamePrefix: 'MeanAnnualSumGPP_perFloodFrequencyClass_withMask'
   // });
 
 
@@ -295,7 +295,7 @@
 
 
 
-// *********************** PART 2 - MEAN TOTAL DRY SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS ***********************
+// *********************** PART 2 - MEAN TOTAL DRY SEASON GPP FOR EACH FLOOD FREQUENCY CLASS ***********************
 
 
 
@@ -303,10 +303,10 @@
 
 /*** PLAN ***/
   // 0 - IMPORTS
-  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL DRY SEASON NET PHOTOSYNTHESIS AS PIXEL VALUE
+  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL DRY SEASON GPP AS PIXEL VALUE
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FLOOD EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON GPP FOR EACH FLOOD FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -322,8 +322,8 @@
   print('Pantanal area', areaP);
   
   // GPP Collection
-  var GPPcollection = imageCollection.select('PsnNet')
-          .map(function (x) { return x.updateMask(x.select('PsnNet').neq(0)) })
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
           .map(function (x) { return x.rename('GPP') });
   print('GPPcollection', GPPcollection);
   
@@ -338,7 +338,7 @@
   var scale = projection.nominalScale();
 
 
-/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL DRY SEASON NET PHOTOSYNTHESIS AS PIXEL VALUE */
+/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL DRY SEASON GPP AS PIXEL VALUE */
 
   /** Create an Image Collection with dry season sum of the MOD17A3H.006 product **/
 
@@ -463,13 +463,13 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the flood aggregate image as a band to the flood aggregate **/
+      // Add the flood aggregate image as a band to the GPP aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FloodClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL DRY SEASON GPP FOR EACH FLOOD FREQUENCY CLASS */
 
   /** Create a list of all the flood frequency categories **/
       
@@ -498,10 +498,10 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding mean dry season total Net Photosynthesis
+            - the corresponding mean total dry season GPP
             **/
   
-      /*** Create the function that returns the mean Net Photosynthesis for each class ***/
+      /*** Create the function that returns the mean total GPP for each frequency class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Flood_Classification').eq(ee.Number(x))
@@ -534,7 +534,7 @@
               .get('Mean_SumGPP');
         var feature = ee.Feature(null, {
                                     'Class': x,
-                                    'Mean_DrySeasonSum_PsnNet': MeanSumGPP,
+                                    'Mean_DrySeasonSum_GPP': MeanSumGPP,
                                     'Standard_Deviation': StandardDeviation,
                                     'N_Pixels': N_pixels
         });
@@ -542,20 +542,20 @@
       }
       
       // Apply the function to the list
-      var MeanDrySeasonSumPsnNet_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
-      print('MeanDrySeasonSumPsnNet_perFloodFrequencyClass', MeanDrySeasonSumPsnNet_perFloodFrequencyClass);
+      var MeanDrySeasonSumGPP_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanDrySeasonSumGPP_perFloodFrequencyClass', MeanDrySeasonSumGPP_perFloodFrequencyClass);
 
 
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the Net Photosynthesis for each class **/
-  // var graph = ui.Chart.feature.byFeature(MeanDrySeasonSumPsnNet_perFloodFrequencyClass, 'Class', 'Mean_DrySeasonSum_PsnNet');
-  // var graph2 = ui.Chart.feature.byFeature(MeanDrySeasonSumPsnNet_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
+  /** Create a graph of showing the GPP for each class **/
+  // var graph = ui.Chart.feature.byFeature(MeanDrySeasonSumGPP_perFloodFrequencyClass, 'Class', 'Mean_DrySeasonSum_GPP');
+  // var graph2 = ui.Chart.feature.byFeature(MeanDrySeasonSumGPP_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
   
   // print(graph.setChartType("ColumnChart")
   //         .setOptions({
-  //                   vAxis: {title: 'Mean_DrySeasonSum_PsnNet'},
+  //                   vAxis: {title: 'Mean_DrySeasonSum_GPP'},
   //                   hAxis: {title: 'Class'}
   //         })
   //     );
@@ -569,10 +569,10 @@
 
   /** Export the collection **/
   // Export.table.toDrive({
-  //   collection: MeanDrySeasonSumPsnNet_perFloodFrequencyClass,
-  //   description: 'MeanDrySeasonSumPsnNet_perFloodFrequencyClass_withMask',
+  //   collection: MeanDrySeasonSumGPP_perFloodFrequencyClass,
+  //   description: 'MeanDrySeasonSumGPP_perFloodFrequencyClass_withMask',
   //   folder: 'BCM2020-2021/Dissertation',
-  //   fileNamePrefix: 'MeanDrySeasonSumPsnNet_perFloodFrequencyClass_withMask'
+  //   fileNamePrefix: 'MeanDrySeasonSumGPP_perFloodFrequencyClass_withMask'
   // });
 
 
@@ -580,7 +580,7 @@
 // #########################################################################################################
 
 
-// *********************** PART 3 - MEAN TOTAL GROWING SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS ***********************
+// *********************** PART 3 - MEAN TOTAL GROWING SEASON GPP FOR EACH FLOOD FREQUENCY CLASS ***********************
 
 
 
@@ -588,10 +588,10 @@
 
 /*** PLAN ***/
   // 0 - IMPORTS
-  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL GROWING SEASON NET PHOTOSYNTHESIS AS PIXEL VALUE
+  // 1 - CREATE AN IMAGE COLLECTION WITH TOTAL GROWING SEASON GPP AS PIXEL VALUE
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FLOOD EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON GPP FOR EACH FLOOD FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -607,8 +607,8 @@
   print('Pantanal area', areaP);
   
   // GPP Collection
-  var GPPcollection = imageCollection.select('PsnNet')
-          .map(function (x) { return x.updateMask(x.select('PsnNet').neq(0)) })
+  var GPPcollection = imageCollection.select('Gpp')
+          .map(function (x) { return x.updateMask(x.select('Gpp').neq(0)) })
           .map(function (x) { return x.rename('GPP') });
   print('GPPcollection', GPPcollection);
   
@@ -623,9 +623,9 @@
   var scale = projection.nominalScale();
 
 
-/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL GROWING SEASON NET PHOTOSYNTHESIS AS PIXEL VALUE */
+/* 1 - CREATE AN IMAGE COLLECTION WITH TOTAL GROWING SEASON GPP AS PIXEL VALUE */
 
-  /** Create an Image Collection with growing season sum of the MOD17A3H.006 product **/
+  /** Create an Image Collection with total growing season of the MOD17A3H.006 product **/
 
         var GPP_image2001 = GPPcollection.select('GPP').filterDate('2000-11-01', '2001-05-31').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-05-31').first(), 
@@ -715,7 +715,6 @@
                   scale: scale
                 });
               });
-
         print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
         var GPPaggregate = MOD17A2H_annualtotal
@@ -745,13 +744,13 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the flood aggregate image as a band to the flood aggregate **/
+      // Add the flood aggregate image as a band to the GPP aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FloodClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON NET PHOTOSYNTHESIS FOR EACH FLOOD FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON GPP FOR EACH FLOOD FREQUENCY CLASS */
 
   /** Create a list of all the flood frequency categories **/
       
@@ -782,14 +781,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding mean growing season total Net Photosynthesis
+            - the corresponding mean total growing season GPP
             **/
   
-      /*** Create the function that returns the mean Net Photosynthesis for each class ***/
+      /*** Create the function that returns the mean total GPP for each frequency class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Flood_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var MeanSumGPP = classOI
               .select('Mean_SumGPP')
               .reduceRegion({
@@ -819,7 +818,7 @@
             .get('Mean_SumGPP');
         var feature = ee.Feature(null, {
                                     'Class': x,
-                                    'Mean_GrowingSeasonSum_PsnNet': MeanSumGPP,
+                                    'Mean_GrowingSeasonSum_GPP': MeanSumGPP,
                                     'Standard_Deviation': StandardDeviation,
                                     'N_Pixels': N_pixels
         });
@@ -827,16 +826,16 @@
       }
       
       // Apply the function to the list
-      var MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
-      print('MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass', MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass);
+      var MeanGrowingSeasonSumGPP_perFloodFrequencyClass = ee.FeatureCollection(listofclasses.map(giveClassMeanGPP));
+      print('MeanGrowingSeasonSumGPP_perFloodFrequencyClass', MeanGrowingSeasonSumGPP_perFloodFrequencyClass);
 
 
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the Net Photosynthesis for each class **/
-  // var graph = ui.Chart.feature.byFeature(MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass, 'Class', 'Mean_GrowingSeasonSum_PsnNet');
-  // var graph2 = ui.Chart.feature.byFeature(MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
+  /** Create a graph of showing the GPP for each class **/
+  // var graph = ui.Chart.feature.byFeature(MeanGrowingSeasonSumGPP_perFloodFrequencyClass, 'Class', 'Mean_GrowingSeasonSum_GPP');
+  // var graph2 = ui.Chart.feature.byFeature(MeanGrowingSeasonSumGPP_perFloodFrequencyClass, 'Class', 'Standard_Deviation');
   
   // print(graph.setChartType("ColumnChart")
   //         .setOptions({
@@ -854,10 +853,10 @@
 
   /** Export the collection **/
   // Export.table.toDrive({
-  //   collection: MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass,
-  //   description: 'MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass_withMask',
+  //   collection: MeanGrowingSeasonSumGPP_perFloodFrequencyClass,
+  //   description: 'MeanGrowingSeasonSumGPP_perFloodFrequencyClass_withMask',
   //   folder: 'BCM2020-2021/Dissertation',
-  //   fileNamePrefix: 'MeanGrowingSeasonSumPsnNet_perFloodFrequencyClass_withMask'
+  //   fileNamePrefix: 'MeanGrowingSeasonSumGPP_perFloodFrequencyClass_withMask'
   // });
 
 
