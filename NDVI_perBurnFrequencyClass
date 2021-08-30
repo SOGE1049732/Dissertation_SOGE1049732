@@ -207,7 +207,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = NDVIaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -245,7 +245,7 @@
             - the corresponding NDVI mean
             **/
   
-      /*** Create the function that returns the flood frequency ***/
+      /*** Create the function that returns the burn frequency ***/
       function giveClassMeanNDVI (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
@@ -507,7 +507,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = NDVIaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -543,7 +543,7 @@
             - the corresponding dry season mean NDVI
             **/
   
-      /*** Create the function that returns the flood frequency ***/
+      /*** Create the function that returns the burn frequency ***/
       function giveClassMeanNDVI (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
