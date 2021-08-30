@@ -487,7 +487,7 @@
             // because ee.Reducer changes the projection
         print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
-        var GPPaggregate = MOD17A2H_annualmeans
+        var GPPaggregate = MOD17A2H_annualtotal
               .mean()
               .clip(pantanal)
               .reproject({crs: 
@@ -824,7 +824,7 @@
             // because ee.Reducer changes the projection
         print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
-        var GPPaggregate = MOD17A2H_annualmeans
+        var GPPaggregate = MOD17A2H_annualtotal
               .mean()
               .clip(pantanal)
               .reproject({crs: 
