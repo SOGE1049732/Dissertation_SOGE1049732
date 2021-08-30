@@ -1,19 +1,30 @@
 // ###########################################################################################################
 
+// PART 1 - RELATIONSHIP BETWEEN ANNUAL RAINFALL AND BURN FREQUENCY CLASS
+// PART 2 - RELATIONSHIP BETWEEN DRY SEASON RAINFALL AND BURN FREQUENCY CLASS
+// PART 3 - RELATIONSHIP BETWEEN WET SEASON RAINFALL AND BURN FREQUENCY CLASS
+
+// ###########################################################################################################
 
 
 
-// ******************* PART 1 - CORRELATION BETWEEN ANNUAL RAINFALL AND BURN FREQUENCY CLASS *******************
+
+
+// ###########################################################################################################
+
+
+
+// ******************* PART 1 - RELATIONSHIP BETWEEN ANNUAL RAINFALL AND BURN FREQUENCY CLASS *******************
 
 
 // -------------------------------------------------------------------------------------------------
 
 /*** PLAN ***/
   // 0 - IMPORTS
-  // 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON RAINFALL
+  // 1 - CREATE AN IMAGE COLLECTION OF ANNUAL RAINFALL
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH FIRE FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH BURN FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -130,11 +141,9 @@
                         CHIRPSimage2020];
                         
         var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
-              // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({crs: CHIRPSprojection, scale: CHIRPSscale});
                 });
-            // because ee.Reducer changes the projection
         print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
         
         var CHIRPSaggregate = CHIRPS_annualcomposites
@@ -151,12 +160,6 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
         
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
@@ -228,7 +231,7 @@
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum()
               .clip(pantanal)
               .reproject({
@@ -243,15 +246,15 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the burn aggregate **/
+      // Add the fire aggregate image as a band to the rainfall aggregate **/
         var combined_aggregate = CHIRPSaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL RAINFALL FOR EACH BURN FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification')
@@ -281,11 +284,11 @@
             - the corresponding mean rainfall
             **/
   
-      /*** Create the function that returns the burn frequency ***/
+      /*** Create the function that returns the mean rainfall for each class ***/
       function giveClassMeanRainfall (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          );
         var MeanRainfall = classOI
             .select('Mean_Rainfall')
             .reduceRegion({
@@ -330,7 +333,7 @@
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the fire frequency for each class **/
+  /** Create a graph of showing the mean rainfall for each class **/
   var graph = ui.Chart.feature.byFeature(SumAnnualRainfall_perFireFrequencyClass, 'Class', 'Mean_Annual_Rainfall');
   var graph2 = ui.Chart.feature.byFeature(SumAnnualRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
   
@@ -356,14 +359,14 @@
 
 
 
-// ******************* PART 2 - CORRELATION BETWEEN DRY SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
+// ******************* PART 2 - RELATIONSHIP BETWEEN DRY SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
 
 
 // -------------------------------------------------------------------------------------------------
 
 /*** PLAN ***/
   // 0 - IMPORTS
-  // 1 - CREATE AN IMAGE COLLECTION OF ANNUAL RAINFALL
+  // 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON RAINFALL
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
   // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON RAINFALL FOR EACH BURN FREQUENCY CLASS
@@ -396,9 +399,9 @@
   var CHIRPSscale = CHIRPSprojection.nominalScale(); //print('CHIRPS scale', CHIRPSscale);
 
 
-/* 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON (MAY-SEPTEMBER) RAINFALL AVERAGE */
+/* 1 - CREATE AN IMAGE COLLECTION OF DRY SEASON (MAY-SEPTEMBER) RAINFALL */
 
-  /** Create an Image Collection with annual sum of the CHIRPS product **/
+  /** Create an Image Collection with dry season sum of the CHIRPS product **/
 
         var CHIRPSimage2001 = CHIRPScollection.select('precipitation').filterDate('2001-05-01', '2001-09-30').sum()
               .copyProperties(CHIRPScollection.select('precipitation').filterDate('2001-01-01', '2001-09-30').first(),
@@ -483,11 +486,9 @@
                         CHIRPSimage2020];
                         
         var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
-              // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({crs: CHIRPSprojection, scale: CHIRPSscale});
                 });
-            // because ee.Reducer changes the projection
         print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
         
         var CHIRPSaggregate = CHIRPS_annualcomposites
@@ -504,13 +505,7 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
-        
+
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
           var band = input.select('BurnDate')
@@ -578,7 +573,7 @@
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum().clip(pantanal)
               .reproject({crs: MODISprojection, scale: MODISscale})
               .select('Classification').rename('Fires_Classification');
@@ -589,15 +584,15 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the burn aggregate **/
+      // Add the fire aggregate image as a band to the rainfall aggregate **/
         var combined_aggregate = CHIRPSaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN DRY SEASON RAINFALL FOR EACH BURN FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification').reduceRegion({
@@ -622,14 +617,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding dry season mean rainfall
+            - the corresponding mean dry season rainfall
             **/
   
-      /*** Create the function that returns the burn frequency ***/
+      /*** Create the function that returns the mean rainfall for each class ***/
       function giveClassMeanRainfall (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var Mean_Rainfall = classOI
             .select('Mean_Rainfall').reduceRegion({
               reducer: ee.Reducer.mean(),
@@ -672,7 +667,7 @@
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the fire frequency for each class **/
+  /** Create a graph of showing the mean rainfall for each class **/
   var graph = ui.Chart.feature.byFeature(SumDrySeasonRainfall_perFireFrequencyClass, 'Class', 'DrySeason_Rainfall');
   var graph2 = ui.Chart.feature.byFeature(SumDrySeasonRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
   
@@ -698,7 +693,7 @@
 // ##########################################################################################################################"
 
 
-// ******************* PART 4 - CORRELATION BETWEEN WET SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
+// ******************* PART 4 - RELATIONSHIP BETWEEN WET SEASON RAINFALL AND BURN FREQUENCY CLASS *******************
 
 
 // -------------------------------------------------------------------------------------------------
@@ -708,7 +703,7 @@
   // 1 - CREATE AN IMAGE COLLECTION OF WET SEASON RAINFALL
   // 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL
   // 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE
-  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN WET SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS
+  // 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN WET SEASON RAINFALL FOR EACH BURN FREQUENCY CLASS
   // 5 - VISUALIZE THE RESULTS
 
 // -------------------------------------------------------------------------------------------------  
@@ -738,7 +733,7 @@
   var CHIRPSscale = CHIRPSprojection.nominalScale(); //print('CHIRPS scale', CHIRPSscale);
 
 
-/* 1 - CREATE AN IMAGE COLLECTION OF WET SEASON (NOVEMBER-MARCH) RAINFALL AVERAGE */
+/* 1 - CREATE AN IMAGE COLLECTION OF WET SEASON (NOVEMBER-MARCH) RAINFALL  */
 
   /** Create an Image Collection with annual sum of the CHIRPS product **/
 
@@ -825,14 +820,12 @@
                         CHIRPSimage2020];
                         
         var CHIRPS_annualcomposites = ee.ImageCollection(CHIRPSimageList)
-              // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({
                   crs: CHIRPSprojection, 
                   scale: CHIRPSscale
                 });
               });
-            // because ee.Reducer changes the projection
         print('CHIRPS_annualcomposites', CHIRPS_annualcomposites);
 
         var CHIRPSaggregate = CHIRPS_annualcomposites
@@ -847,13 +840,7 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
-        
+
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
           var band = input.select('BurnDate')
@@ -921,7 +908,7 @@
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum().clip(pantanal)
               .reproject({crs: MODISprojection, scale: MODISscale})
               .select('Classification').rename('Fires_Classification');
@@ -942,9 +929,9 @@
         print(test)
         Map.addLayer(test)
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN GROWING SEASON RAINFALL FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN GROWING SEASON RAINFALL FOR EACH BURN FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification')
@@ -971,14 +958,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding mean rainfall
+            - the corresponding mean wet season rainfall
             **/
   
-      /*** Create the function that returns the burn frequency ***/
+      /*** Create the function that returns the mean rainfall for each class ***/
       function giveClassMeanRainfall (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var MeanRainfall= classOI
             .select('Mean_Rainfall')
             .reduceRegion({
@@ -1023,7 +1010,7 @@
 
 /* 5 - VISUALIZE THE RESULTS */
 
-  /** Create a graph of showing the fire frequency for each class **/
+  /** Create a graph of showing the mean rainfall for each class **/
   var graph = ui.Chart.feature.byFeature(SumWetSeasonRainfall_perFireFrequencyClass, 'Class', 'WetSeason_Rainfall');
   var graph2 = ui.Chart.feature.byFeature(SumWetSeasonRainfall_perFireFrequencyClass, 'Class', 'Standard_Deviation');
   
