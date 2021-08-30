@@ -253,7 +253,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -599,7 +599,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
@@ -947,7 +947,7 @@
   
 /* 3 - COMBINE BOTH AGGREGATES AS BANDS OF A SINGLE IMAGE */
 
-      // Add the fire aggregate image as a band to the flood aggregate **/
+      // Add the fire aggregate image as a band to the burn aggregate **/
         var combined_aggregate = GPPaggregate.addBands(FireClassificationAggregate);
         print('combined_aggregate', combined_aggregate);
 
