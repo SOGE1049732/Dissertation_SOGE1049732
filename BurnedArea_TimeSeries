@@ -40,12 +40,6 @@
   // Create a function that turns 'MODIS Monthly Burned Area Product' image collection into a collection
   // of area-images wherein each 'burned' pixel is attributed a value equals to the area of lands it covers
     /** STEP 1: Add a classification band to the image collection **/
-        /*** this classifcation band attributes 
-              1 to burned area ('BurnDate': 1)
-              0 to unburned areas ('BurnDate': 0),
-                to unmapped areas ('BurnDate': -1),
-                and to water areas ('BurnDate': -2).
-                ***/
       // Create a function that add a classification band
       function add_ClassificationBand (input) {
         var band = input.select('BurnDate')
