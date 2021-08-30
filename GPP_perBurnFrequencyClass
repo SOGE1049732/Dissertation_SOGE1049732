@@ -53,7 +53,7 @@
 
 /* 1 - CREATE AN IMAGE COLLECTION WITH ANNUAL TOTAL GPP AS PIXEL VALUE */
 
-  /** Create an Image Collection with annual SUM of the MOD17A3H.006 product **/
+  /** Create an Image Collection with annual sum of the MOD17A3H.006 product **/
 
         var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-12-31').first(), 
@@ -137,7 +137,7 @@
                         GPP_image2019,
                         GPP_image2020];
                       
-        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+        var MOD17A2H_annualtotal = ee.ImageCollection(GPP_imageList)
               // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({
@@ -146,9 +146,9 @@
                 });
               });
             // because ee.Reducer changes the projection
-        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
-        var GPPaggregate = MOD17A2H_annualmeans
+        var GPPaggregate = MOD17A2H_annualtotal
               .mean()
               .clip(pantanal)
               .reproject({crs: 
@@ -161,12 +161,6 @@
 /* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
         
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
@@ -238,7 +232,7 @@
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum()
               .clip(pantanal)
               .reproject({crs: 
@@ -259,9 +253,9 @@
 
 
 
-/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN OVERALL GPP FOR EACH FIRE FREQUENCY CLASS */
+/* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL ANNUAL GPP FOR EACH FIRE FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification')
@@ -288,14 +282,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding total GPP mean
+            - the corresponding mean total GPP
             **/
   
-      /*** Create the function that returns the fire frequency ***/
+      /*** Create the function that returns the mean GPP for each class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          ); 
         var MeanGPP = classOI
             .select('Mean_GPP')
             .reduceRegion({
@@ -399,7 +393,7 @@
 
 /* 1 - CREATE AN IMAGE COLLECTION WITH DRY SEASON TOTAL GPP AS PIXEL VALUE */
 
-  /** Create an Image Collection with dry season mean of the MOD17A3H.006 product **/
+  /** Create an Image Collection with total dry season of the MOD17A3H.006 product **/
 
         var GPP_image2001 = GPPcollection.select('GPP').filterDate('2001-05-01', '2001-09-30').sum()
             .copyProperties(GPPcollection.select('GPP').filterDate('2001-01-01', '2001-09-30').first(), 
@@ -483,7 +477,7 @@
                         GPP_image2019,
                         GPP_image2020];
                       
-        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+        var MOD17A2H_annualtotal = ee.ImageCollection(GPP_imageList)
               // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({
@@ -492,9 +486,9 @@
                 });
               });
             // because ee.Reducer changes the projection
-        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
-        var GPPaggregate = MOD17A2H_annualmeans
+        var GPPaggregate = MOD17A2H_annualtotal
               .mean()
               .clip(pantanal)
               .reproject({crs: 
@@ -504,16 +498,10 @@
               .select('GPP').rename('Mean_GPP');
 
 
-/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF BURN EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
-        
+
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
           var band = input.select('BurnDate')
@@ -634,14 +622,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding total GPP mean
+            - the corresponding mean total GPP
             **/
   
-      /*** Create the function that returns the fire frequency ***/
+      /*** Create the function that returns the mean GPP for each class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          );
         var MeanGPP = classOI
             .select('Mean_GPP')
             .reduceRegion({
@@ -831,7 +819,7 @@
                         GPP_image2019,
                         GPP_image2020];
                       
-        var MOD17A2H_annualmeans = ee.ImageCollection(GPP_imageList)
+        var MOD17A2H_annualtotal = ee.ImageCollection(GPP_imageList)
               // .map(function (x) {return x.set('system:id', ee.String(x))})
               .map(function (y) {
                 return y.reproject({
@@ -840,9 +828,9 @@
                 });
               });
             // because ee.Reducer changes the projection
-        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualmeans);
+        print('MOD17A2H.006 Annual Composites - Collection', MOD17A2H_annualtotal);
 
-        var GPPaggregate = MOD17A2H_annualmeans
+        var GPPaggregate = MOD17A2H_annualtotal
               .mean()
               .clip(pantanal)
               .reproject({crs: 
@@ -852,16 +840,10 @@
               .select('GPP').rename('Mean_GPP');
 
 
-/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF FIRE EVENTS FOR EACH PIXEL */
+/* 2 - CREATE AGGREGATE IMAGE GIVING THE NUMBER OF BURN EVENTS FOR EACH PIXEL */
 
   /** Add a classification band to the image collection **/
-          /* this classifcation band attributes 
-                1 to burned area ('BurnDate': 1)
-                0 to unburned areas ('BurnDate': 0),
-                  to unmapped areas ('BurnDate': -1),
-                  and to water areas ('BurnDate': -2).
-                  */
-        
+
         // Create a function that adds a classification band
         function add_ClassificationBand (input) {
           var band = input.select('BurnDate')
@@ -932,7 +914,7 @@
  
   /** Create an aggregate image that gives each pixel the value of the number of burn events over the time-period OI **/
  
-        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)}) // unmask necessary?
+        var FireClassificationAgg = MCD64A1_annualcomposites.map(function (x) {return x.unmask(0)})
               .sum()
               .clip(pantanal)
               .reproject({crs: 
@@ -955,7 +937,7 @@
 
 /* 4 - CREATE A FEATURE COLLECTION GIVING THE MEAN TOTAL GROWING SEASON GPP FOR EACH FIRE FREQUENCY CLASS */
 
-  /** Create a list of all the FIRE frequencies categories **/
+  /** Create a list of all the burn frequencies categories **/
       
         // Get min value
         var min = combined_aggregate.select('Fires_Classification')
@@ -982,14 +964,14 @@
   /** Create a function **/ 
   /** that takes a class and returns a feature giving 
             - the name of the class
-            - the corresponding total GPP mean
+            - the corresponding mean total GPP
             **/
   
-      /*** Create the function that returns the fire frequency ***/
+      /*** Create the function that returns the mean GPP for each class ***/
       function giveClassMeanGPP (x) {
         var classOI = combined_aggregate.updateMask(
           combined_aggregate.select('Fires_Classification').eq(ee.Number(x))
-          ); // mask applies to all bands (necessary for next step)
+          );
         var MeanGPP = classOI
             .select('Mean_GPP')
             .reduceRegion({
